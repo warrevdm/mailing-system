@@ -56,8 +56,13 @@ if ($pickupNote !== '') {
 
 $lines = array_merge($lines, [
     '',
-    'Plan hier eenvoudig je afhaalmoment:',
-    BOOKING_URL,
+    '──────────────────────────────',
+    'PLAN JE AFHAALMOMENT',
+    '',
+    'Kies via onderstaande link het moment dat voor jou het beste past:',
+    '',
+    '👉 ' . BOOKING_URL,
+    '──────────────────────────────',
     '',
     'Zo kunnen we voldoende tijd voorzien om je fiets samen te overlopen en correct af te stellen.',
     '',
