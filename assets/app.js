@@ -5,6 +5,7 @@ const closePreview = document.querySelector('#closePreview');
 const previewContent = document.querySelector('#previewContent');
 const note = document.querySelector('#pickup_note');
 const noteCount = document.querySelector('#noteCount');
+const downloadMessage = document.querySelector('#downloadMessage');
 
 const fields = {
     customer_name: 'Vul de naam van de klant in.',
@@ -84,5 +85,11 @@ previewDialog.addEventListener('click', event => {
 });
 
 form.addEventListener('submit', event => {
-    if (!validateForm()) event.preventDefault();
+    if (!validateForm()) {
+        event.preventDefault();
+        return;
+    }
+
+    downloadMessage.hidden = false;
+    downloadMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 });
