@@ -1,0 +1,7 @@
+{
+  "name": "aerts-action-bike/fiets-klaar-mailer",
+  "description": "Interne webapp om klanten te mailen wanneer hun fiets klaarstaat.",
+  "require": {
+    "phpmailer/phpmailer": "^6.9"
+  }
+}
