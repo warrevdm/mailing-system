@@ -2,11 +2,17 @@
 session_start();
 
 require __DIR__ . '/src/config.php';
+require __DIR__ . '/src/mail-template.php';
 
 function redirectWithError(string $message): never
 {
     header('Location: index.php?status=error&message=' . urlencode($message));
     exit;
+}
+
+function cleanHeaderValue(string $value): string
+{
+    return trim(str_replace(["\r", "\n"], '', $value));
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -40,50 +46,46 @@ if (mb_strlen($pickupNote) > 500) {
 }
 
 $subject = 'Je fiets staat klaar voor afhaling';
+$htmlBody = buildMailHtml($name, $bikeType, $pickupNote);
+$textBody = buildMailText($name, $bikeType, $pickupNote);
+$boundary = 'aab_' . bin2hex(random_bytes(16));
 
-$lines = [
-    'Beste ' . $name . ',',
-    '',
-    'Goed nieuws: je fiets staat klaar voor afhaling bij Aerts Action Bike.',
-    '',
-    'Fiets: ' . $bikeType,
+$fromName = cleanHeaderValue(MAIL_FROM_NAME);
+$fromAddress = cleanHeaderValue(MAIL_FROM_ADDRESS);
+$toAddress = cleanHeaderValue($email);
+$encodedSubject = mb_encode_mimeheader($subject, 'UTF-8', 'B', "\r\n");
+$encodedFromName = mb_encode_mimeheader($fromName, 'UTF-8', 'B', "\r\n");
+
+$headers = [
+    'X-Unsent: 1',
+    'From: ' . $encodedFromName . ' <' . $fromAddress . '>',
+    'To: ' . $toAddress,
+    'Subject: ' . $encodedSubject,
+    'Date: ' . date(DATE_RFC2822),
+    'MIME-Version: 1.0',
+    'Content-Type: multipart/alternative; boundary="' . $boundary . '"',
 ];
 
-if ($pickupNote !== '') {
-    $lines[] = '';
-    $lines[] = $pickupNote;
-}
-
-$lines = array_merge($lines, [
-    '',
-    '──────────────────────────────',
-    'PLAN JE AFHAALMOMENT',
-    '',
-    'Kies via onderstaande link het moment dat voor jou het beste past:',
-    '',
-    '👉 ' . BOOKING_URL,
-    '──────────────────────────────',
-    '',
-    'Zo kunnen we voldoende tijd voorzien om je fiets samen te overlopen en correct af te stellen.',
-    '',
-    'Sportieve groeten,',
-    '',
-    'Team Aerts Action Bike',
-    'Kapellensteenweg 394',
-    '2920 Kalmthout',
-    '03 666 97 01',
-    'www.aertsactionbike.be',
-]);
-
-$body = implode("\r\n", $lines);
-
-$outlookUrl = 'https://outlook.office.com/mail/deeplink/compose?' . http_build_query([
-    'to' => $email,
-    'subject' => $subject,
-    'body' => $body,
-], '', '&', PHP_QUERY_RFC3986);
+$eml = implode("\r\n", $headers) . "\r\n\r\n";
+$eml .= '--' . $boundary . "\r\n";
+$eml .= "Content-Type: text/plain; charset=UTF-8\r\n";
+$eml .= "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
+$eml .= quoted_printable_encode($textBody) . "\r\n\r\n";
+$eml .= '--' . $boundary . "\r\n";
+$eml .= "Content-Type: text/html; charset=UTF-8\r\n";
+$eml .= "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
+$eml .= quoted_printable_encode($htmlBody) . "\r\n\r\n";
+$eml .= '--' . $boundary . "--\r\n";
 
 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
-header('Location: ' . $outlookUrl);
+$safeFilename = preg_replace('/[^a-zA-Z0-9_-]+/', '-', strtolower($name));
+$filename = 'fiets-klaar-' . trim((string) $safeFilename, '-') . '.eml';
+
+header('Content-Type: message/rfc822');
+header('Content-Disposition: attachment; filename="' . $filename . '"');
+header('Content-Length: ' . strlen($eml));
+header('Cache-Control: no-store, no-cache, must-revalidate');
+
+echo $eml;
 exit;
