@@ -7,6 +7,20 @@ if (empty($_SESSION['csrf_token'])) {
 
 $status = $_GET['status'] ?? '';
 $message = $_GET['message'] ?? '';
+
+// Oude SMTP-fouten kunnen als queryparameter in een opgeslagen of vernieuwde URL blijven staan.
+// De huidige versie gebruikt geen SMTP meer, dus verwijder die verouderde melding automatisch.
+if (
+    $status === 'error'
+    && (
+        stripos($message, 'SMTP-fout') !== false
+        || stripos($message, 'SMTP Error') !== false
+        || stripos($message, 'Could not authenticate') !== false
+    )
+) {
+    header('Location: index.php');
+    exit;
+}
 ?>
 <!doctype html>
 <html lang="nl-BE">
