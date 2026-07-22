@@ -35,6 +35,10 @@ $message = $_GET['message'] ?? '';
             <div class="alert error"><?= htmlspecialchars($message ?: 'Het Outlook-concept kon niet worden gemaakt.', ENT_QUOTES, 'UTF-8') ?></div>
         <?php endif; ?>
 
+        <div class="alert success" id="downloadMessage" hidden>
+            Het Outlook-concept is aangemaakt. Klik op het gedownloade bestand om het te openen.
+        </div>
+
         <form id="mailForm" action="send.php" method="post" novalidate>
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
 
@@ -66,7 +70,7 @@ $message = $_GET['message'] ?? '';
 
             <div class="actions">
                 <button type="button" class="button button-secondary" id="previewButton">Voorbeeld bekijken</button>
-                <button type="submit" class="button button-primary">Outlook-concept maken</button>
+                <button type="submit" class="button button-primary">Maak en open Outlook-concept</button>
             </div>
         </form>
     </section>
