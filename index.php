@@ -22,17 +22,17 @@ $message = $_GET['message'] ?? '';
         <div class="brand-mark">AAB</div>
         <p class="eyebrow">Aerts Action Bike</p>
         <h1>Fiets klaar voor afhaling</h1>
-        <p class="lead">Vul de klantgegevens in, controleer de mail en open ze daarna als concept in Outlook.</p>
+        <p class="lead">Vul de klantgegevens in en maak een professioneel Outlook-concept met dezelfde opmaak als het voorbeeld.</p>
 
         <div class="info-card">
-            <strong>Handmatige controle</strong>
-            <p>Outlook opent met ontvanger, onderwerp en mailtekst ingevuld. Controleer de mail en klik daarna zelf op verzenden.</p>
+            <strong>Zo werkt het</strong>
+            <p>Het systeem downloadt een Outlook-concept met HTML-opmaak en een duidelijke bookingknop. Open het bestand, controleer de mail en klik zelf op verzenden.</p>
         </div>
     </section>
 
     <section class="panel form-panel">
         <?php if ($status === 'error'): ?>
-            <div class="alert error"><?= htmlspecialchars($message ?: 'Outlook kon niet worden geopend.', ENT_QUOTES, 'UTF-8') ?></div>
+            <div class="alert error"><?= htmlspecialchars($message ?: 'Het Outlook-concept kon niet worden gemaakt.', ENT_QUOTES, 'UTF-8') ?></div>
         <?php endif; ?>
 
         <form id="mailForm" action="send.php" method="post" novalidate>
@@ -66,7 +66,7 @@ $message = $_GET['message'] ?? '';
 
             <div class="actions">
                 <button type="button" class="button button-secondary" id="previewButton">Voorbeeld bekijken</button>
-                <button type="submit" class="button button-primary">Openen in Outlook</button>
+                <button type="submit" class="button button-primary">Outlook-concept maken</button>
             </div>
         </form>
     </section>
