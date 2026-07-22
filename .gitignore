@@ -1,0 +1,5 @@
+/vendor/
+/src/config.php
+.env
+.env.*
+!.env.example
