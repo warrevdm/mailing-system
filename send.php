@@ -10,6 +10,29 @@ function redirectWithMessage(string $status, string $message): never
     exit;
 }
 
+function resendFriendlyError(int $httpStatus, string $detail): string
+{
+    $normalized = strtolower($detail);
+
+    if ($httpStatus === 401 || str_contains($normalized, 'api key')) {
+        return 'De Resend API-key is ongeldig of ingetrokken. Maak een nieuwe key en plaats die in src/config.php.';
+    }
+
+    if (str_contains($normalized, 'domain') || str_contains($normalized, 'verify')) {
+        return 'Het verzenddomein of afzenderadres is nog niet geverifieerd in Resend.';
+    }
+
+    if (str_contains($normalized, 'from')) {
+        return 'Het afzenderadres is niet toegestaan. Controleer MAIL_FROM_ADDRESS in src/config.php.';
+    }
+
+    if ($httpStatus === 429) {
+        return 'De verzendlimiet van Resend is tijdelijk bereikt. Probeer later opnieuw.';
+    }
+
+    return 'Resend-fout: ' . mb_substr($detail, 0, 240);
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     redirectWithMessage('error', 'Ongeldige aanvraag.');
 }
@@ -70,14 +93,14 @@ curl_close($curl);
 
 if ($response === false) {
     error_log('Resend netwerkfout: ' . $curlError);
-    redirectWithMessage('error', 'De mail kon niet worden verstuurd. Probeer opnieuw.');
+    redirectWithMessage('error', 'Netwerkfout bij Resend: ' . mb_substr($curlError, 0, 180));
 }
 
 $data = json_decode((string) $response, true);
 if ($httpStatus < 200 || $httpStatus >= 300 || !is_array($data) || empty($data['id'])) {
-    $detail = is_array($data) ? ($data['message'] ?? 'Onbekende fout') : 'Ongeldig antwoord';
+    $detail = is_array($data) ? (string) ($data['message'] ?? 'Onbekende fout') : 'Ongeldig antwoord van Resend';
     error_log('Resend fout (' . $httpStatus . '): ' . $detail);
-    redirectWithMessage('error', 'De mail kon niet worden verstuurd. Controleer de Resend-instellingen.');
+    redirectWithMessage('error', resendFriendlyError($httpStatus, $detail));
 }
 
 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
