@@ -72,6 +72,8 @@ try {
     header('Location: index.php?status=success');
     exit;
 } catch (Exception $exception) {
-    error_log('AAB mail error: ' . $mail->ErrorInfo);
-    redirectWithError('De mail kon niet worden verstuurd. Controleer de SMTP-instellingen.');
+    $error = $mail->ErrorInfo ?: $exception->getMessage();
+    error_log('AAB mail error: ' . $error);
+
+    redirectWithError('SMTP-fout: ' . $error);
 }
