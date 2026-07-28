@@ -55,13 +55,13 @@ function buildPreview() {
         <div style="max-width:640px;margin:auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 8px 24px rgba(20,35,24,.08);font-family:Arial,sans-serif;">
             <div style="background:#172019;padding:28px 32px;color:#fff;">
                 <div style="font-size:13px;letter-spacing:1.7px;text-transform:uppercase;color:#9bd889;font-weight:700;">Aerts Action Bike</div>
-                <h2 style="margin:10px 0 0;font-size:30px;">Je fiets staat klaar</h2>
+                <h2 style="margin:10px 0 0;font-size:30px;">Je nieuwe fiets staat klaar</h2>
             </div>
             <div style="padding:32px;font-size:16px;line-height:1.7;color:#263229;">
                 <small style="color:#667068;">Naar: ${email}</small><br><br>
                 Dag ${name},<br><br>
-                Goed nieuws: je <strong>${bike}</strong> staat klaar voor afhaling bij Aerts Action Bike.<br><br>
-                Plan hieronder eenvoudig een afhaalmoment in. Zo kunnen we voldoende tijd voorzien om alles rustig samen te overlopen.
+                Goed nieuws: je nieuwe <strong>${bike}</strong> staat klaar voor afhaling bij Aerts Action Bike.<br><br>
+                Plan hieronder eenvoudig een afhaalmoment in. Zo kunnen we voldoende tijd voorzien om je nieuwe fiets rustig samen te overlopen en correct af te stellen.
                 <div style="text-align:center;padding:28px 0;">
                     <span style="display:inline-block;background:#60bb46;padding:15px 24px;border-radius:8px;font-weight:700;">Plan je afhaalmoment</span>
                 </div>
