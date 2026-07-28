@@ -39,7 +39,7 @@ function buildMailHtml(string $name, string $bikeType, string $pickupNote = ''):
         <td style="padding:32px 32px 18px;font-size:16px;line-height:1.7;color:#263229;">
             Dag {$safeName},
             <br><br>
-            Goed nieuws: je <strong>{$safeBikeType}</strong> staat klaar voor afhaling bij Aerts Action Bike.
+            Goed nieuws: je nieuwe <strong>{$safeBikeType}</strong> staat klaar voor afhaling bij Aerts Action Bike.
             <br><br>
             Plan hieronder eenvoudig een afhaalmoment in. Zo kunnen we voldoende tijd voorzien om alles rustig samen te overlopen.
         </td>

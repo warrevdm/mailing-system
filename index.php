@@ -21,7 +21,7 @@ $message = $_GET['message'] ?? '';
     <section class="panel intro-panel">
         <div class="brand-mark">AAB</div>
         <p class="eyebrow">Aerts Action Bike</p>
-        <h1>Fiets klaar voor afhaling</h1>
+        <h1>Nieuwe fiets klaar voor afhaling</h1>
         <p class="lead">Vul de klantgegevens in en verstuur meteen een professionele mail met bookingknop.</p>
 
         <div class="info-card">

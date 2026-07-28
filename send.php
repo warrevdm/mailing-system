@@ -67,7 +67,7 @@ $payload = [
     'from' => MAIL_FROM_NAME . ' <' . MAIL_FROM_ADDRESS . '>',
     'to' => [$email],
     'reply_to' => MAIL_REPLY_TO,
-    'subject' => 'Je fiets staat klaar voor afhaling',
+    'subject' => 'Je nieuwe fiets staat klaar voor afhaling',
     'html' => buildMailHtml($name, $bikeType, $pickupNote),
     'text' => buildMailText($name, $bikeType, $pickupNote),
 ];
