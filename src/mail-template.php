@@ -22,7 +22,7 @@ function buildMailHtml(string $name, string $bikeType, string $pickupNote = ''):
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Je nieuwefiets staat klaar</title>
+    <title>Je nieuwe fiets staat klaar</title>
 </head>
 <body style="margin:0;padding:0;background:#f3f4f2;font-family:Arial,Helvetica,sans-serif;color:#172019;">
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f3f4f2;padding:24px 12px;">
@@ -32,7 +32,7 @@ function buildMailHtml(string $name, string $bikeType, string $pickupNote = ''):
     <tr>
         <td style="background:#172019;padding:28px 32px;">
             <div style="font-size:13px;letter-spacing:1.7px;text-transform:uppercase;color:#9bd889;font-weight:700;">Aerts Action Bike</div>
-            <h1 style="margin:10px 0 0;color:#ffffff;font-size:30px;line-height:1.2;">Je fiets staat klaar</h1>
+            <h1 style="margin:10px 0 0;color:#ffffff;font-size:30px;line-height:1.2;">Je nieuwe fiets staat klaar</h1>
         </td>
     </tr>
     <tr>
@@ -41,7 +41,7 @@ function buildMailHtml(string $name, string $bikeType, string $pickupNote = ''):
             <br><br>
             Goed nieuws: je nieuwe <strong>{$safeBikeType}</strong> staat klaar voor afhaling bij Aerts Action Bike.
             <br><br>
-            Plan hieronder eenvoudig een afhaalmoment in. Zo kunnen we voldoende tijd voorzien om alles rustig samen te overlopen.
+            Plan hieronder eenvoudig een afhaalmoment in. Zo kunnen we voldoende tijd voorzien om je nieuwe fiets rustig samen te overlopen en correct af te stellen.
         </td>
     </tr>
     <tr>
@@ -76,7 +76,7 @@ HTML;
 
 function buildMailText(string $name, string $bikeType, string $pickupNote = ''): string
 {
-    $text = "Dag {$name},\n\nGoed nieuws: je {$bikeType} staat klaar voor afhaling bij Aerts Action Bike.\n\nPlan je afhaalmoment via:\n" . BOOKING_URL . "\n";
+    $text = "Dag {$name},\n\nGoed nieuws: je nieuwe {$bikeType} staat klaar voor afhaling bij Aerts Action Bike.\n\nPlan je afhaalmoment via:\n" . BOOKING_URL . "\n\nZo kunnen we voldoende tijd voorzien om je nieuwe fiets rustig samen te overlopen en correct af te stellen.\n";
 
     if ($pickupNote !== '') {
         $text .= "\nExtra informatie:\n{$pickupNote}\n";
