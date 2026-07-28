@@ -60,13 +60,14 @@ function buildPreview() {
             <div style="padding:32px;font-size:16px;line-height:1.7;color:#263229;">
                 <small style="color:#667068;">Naar: ${email}</small><br><br>
                 Dag ${name},<br><br>
-                Goed nieuws: je nieuwe <strong>${bike}</strong> staat klaar voor afhaling bij Aerts Action Bike.<br><br>
-                Plan hieronder eenvoudig een afhaalmoment in. Zo kunnen we voldoende tijd voorzien om je nieuwe fiets rustig samen te overlopen en correct af te stellen.
+                <strong>Proficiat met je nieuwe fiets!</strong><br><br>
+                Goed nieuws: je nieuwe <strong>${bike}</strong> staat volledig klaar voor afhaling bij Aerts Action Bike.<br><br>
+                Tijdens de afhaling nemen we de tijd om je nieuwe fiets samen te overlopen, correct af te stellen en alle belangrijke uitleg mee te geven.
                 <div style="text-align:center;padding:28px 0;">
-                    <span style="display:inline-block;background:#60bb46;padding:15px 24px;border-radius:8px;font-weight:700;">Plan je afhaalmoment</span>
+                    <span style="display:inline-block;background:#60bb46;padding:15px 24px;border-radius:8px;font-weight:700;">Plan de afhaling van je nieuwe fiets</span>
                 </div>
                 ${extra ? `<div style="padding:16px 18px;background:#f4f7f2;border-left:4px solid #60bb46;border-radius:8px;"><strong>Extra informatie</strong><br>${extra}</div><br>` : ''}
-                Heb je nog een vraag? Antwoord gerust op deze mail.<br><br>
+                Heb je nog een vraag over je nieuwe fiets? Antwoord gerust op deze mail.<br><br>
                 Sportieve groeten,<br><strong>Team Aerts Action Bike</strong>
             </div>
         </div>`;
