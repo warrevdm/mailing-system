@@ -22,7 +22,7 @@ function buildMailHtml(string $name, string $bikeType, string $pickupNote = ''):
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Je fiets staat klaar</title>
+    <title>Je nieuwefiets staat klaar</title>
 </head>
 <body style="margin:0;padding:0;background:#f3f4f2;font-family:Arial,Helvetica,sans-serif;color:#172019;">
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f3f4f2;padding:24px 12px;">
