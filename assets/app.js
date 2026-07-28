@@ -5,12 +5,12 @@ const closePreview = document.querySelector('#closePreview');
 const previewContent = document.querySelector('#previewContent');
 const note = document.querySelector('#pickup_note');
 const noteCount = document.querySelector('#noteCount');
-const submitButton = form.querySelector('button[type="submit"]');
+const downloadMessage = document.querySelector('#downloadMessage');
 
 const fields = {
     customer_name: 'Vul de naam van de klant in.',
     customer_email: 'Vul een geldig e-mailadres in.',
-    bike_type: 'Vul het type of model van de fiets in.'
+    bike_type: 'Vul het type of model van de nieuwe fiets in.'
 };
 
 function escapeHtml(value) {
@@ -90,6 +90,6 @@ form.addEventListener('submit', event => {
         return;
     }
 
-    submitButton.disabled = true;
-    submitButton.textContent = 'Mail wordt verstuurd…';
+    downloadMessage.hidden = false;
+    downloadMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 });
