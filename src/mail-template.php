@@ -39,20 +39,22 @@ function buildMailHtml(string $name, string $bikeType, string $pickupNote = ''):
         <td style="padding:32px 32px 18px;font-size:16px;line-height:1.7;color:#263229;">
             Dag {$safeName},
             <br><br>
-            Goed nieuws: je nieuwe <strong>{$safeBikeType}</strong> staat klaar voor afhaling bij Aerts Action Bike.
+            <strong>Proficiat met je nieuwe fiets!</strong>
             <br><br>
-            Plan hieronder eenvoudig een afhaalmoment in. Zo kunnen we voldoende tijd voorzien om je nieuwe fiets rustig samen te overlopen en correct af te stellen.
+            Goed nieuws: je nieuwe <strong>{$safeBikeType}</strong> staat volledig klaar voor afhaling bij Aerts Action Bike.
+            <br><br>
+            Tijdens de afhaling nemen we de tijd om je nieuwe fiets samen te overlopen, correct af te stellen en alle belangrijke uitleg mee te geven.
         </td>
     </tr>
     <tr>
         <td align="center" style="padding:8px 32px 30px;">
-            <a href="{$bookingUrl}" target="_blank" style="display:inline-block;background:#60bb46;color:#102012;text-decoration:none;font-weight:700;font-size:16px;padding:15px 24px;border-radius:8px;">Plan je afhaalmoment</a>
+            <a href="{$bookingUrl}" target="_blank" style="display:inline-block;background:#60bb46;color:#102012;text-decoration:none;font-weight:700;font-size:16px;padding:15px 24px;border-radius:8px;">Plan de afhaling van je nieuwe fiets</a>
         </td>
     </tr>
     {$noteBlock}
     <tr>
         <td style="padding:0 32px 30px;font-size:15px;line-height:1.7;color:#455148;">
-            Heb je nog een vraag? Antwoord gerust op deze mail of neem contact op met onze winkel.
+            Heb je nog een vraag over je nieuwe fiets? Antwoord gerust op deze mail of neem contact op met onze winkel.
             <br><br>
             Sportieve groeten,<br>
             <strong>Team Aerts Action Bike</strong>
@@ -76,11 +78,11 @@ HTML;
 
 function buildMailText(string $name, string $bikeType, string $pickupNote = ''): string
 {
-    $text = "Dag {$name},\n\nGoed nieuws: je nieuwe {$bikeType} staat klaar voor afhaling bij Aerts Action Bike.\n\nPlan je afhaalmoment via:\n" . BOOKING_URL . "\n\nZo kunnen we voldoende tijd voorzien om je nieuwe fiets rustig samen te overlopen en correct af te stellen.\n";
+    $text = "Dag {$name},\n\nProficiat met je nieuwe fiets!\n\nGoed nieuws: je nieuwe {$bikeType} staat volledig klaar voor afhaling bij Aerts Action Bike.\n\nTijdens de afhaling nemen we de tijd om je nieuwe fiets samen te overlopen, correct af te stellen en alle belangrijke uitleg mee te geven.\n\nPlan de afhaling van je nieuwe fiets via:\n" . BOOKING_URL . "\n";
 
     if ($pickupNote !== '') {
         $text .= "\nExtra informatie:\n{$pickupNote}\n";
     }
 
-    return $text . "\nHeb je nog een vraag? Antwoord gerust op deze mail.\n\nSportieve groeten,\nTeam Aerts Action Bike\nKapellensteenweg 394, 2920 Kalmthout\n+32 (0)3 666 97 01";
+    return $text . "\nHeb je nog een vraag over je nieuwe fiets? Antwoord gerust op deze mail.\n\nSportieve groeten,\nTeam Aerts Action Bike\nKapellensteenweg 394, 2920 Kalmthout\n+32 (0)3 666 97 01";
 }
