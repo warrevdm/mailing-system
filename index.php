@@ -1,10 +1,9 @@
 <?php
-session_start();
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+declare(strict_types=1);
 
+require __DIR__ . '/src/auth.php';
+$currentUser = authRequireLogin();
 $status = $_GET['status'] ?? '';
 $message = $_GET['message'] ?? '';
 ?>
@@ -17,59 +16,38 @@ $message = $_GET['message'] ?? '';
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
+<header class="topbar app-topbar">
+    <div class="topbar-brand">
+        <img src="assets/aab-logo.svg" alt="Aerts Action Bike">
+        <div><strong>Interne mailingtool</strong><small><?= htmlspecialchars((string) $currentUser['name'], ENT_QUOTES, 'UTF-8') ?></small></div>
+    </div>
+    <nav>
+        <?php if (($currentUser['role'] ?? '') === 'admin'): ?><a class="button button-secondary" href="admin.php">Gebruikersbeheer</a><?php endif; ?>
+        <a class="button button-secondary" href="logout.php">Uitloggen</a>
+    </nav>
+</header>
+
 <main class="app-shell">
     <section class="panel intro-panel">
-        <div class="brand-logo-wrap">
-            <img src="assets/aab-logo.svg" alt="Aerts Action Bike" class="brand-logo">
-        </div>
+        <div class="brand-logo-wrap"><img src="assets/aab-logo.svg" alt="Aerts Action Bike" class="brand-logo"></div>
         <p class="eyebrow">Aerts Action Bike</p>
         <h1>Nieuwe fiets klaar voor afhaling</h1>
         <p class="lead">Vul de klantgegevens in en verstuur de mail rechtstreeks vanuit verkoop@aertsactionbike.be via Microsoft 365.</p>
-
-        <div class="info-card">
-            <strong>Interne send mode</strong>
-            <p>De groene knop verstuurt de HTML-mail rechtstreeks via Microsoft Graph. De Outlook .eml-versie blijft beschikbaar als fallback.</p>
-        </div>
+        <div class="info-card"><strong>Interne send mode</strong><p>De groene knop verstuurt de HTML-mail rechtstreeks via Microsoft Graph. De Outlook .eml-versie blijft beschikbaar als fallback.</p></div>
     </section>
 
     <section class="panel form-panel">
-        <?php if ($status === 'success'): ?>
-            <div class="alert success"><?= htmlspecialchars($message ?: 'De mail werd succesvol verstuurd.', ENT_QUOTES, 'UTF-8') ?></div>
-        <?php endif; ?>
-
-        <?php if ($status === 'error'): ?>
-            <div class="alert error"><?= htmlspecialchars($message ?: 'De mail kon niet worden verstuurd.', ENT_QUOTES, 'UTF-8') ?></div>
-        <?php endif; ?>
+        <?php if ($status === 'success'): ?><div class="alert success"><?= htmlspecialchars($message ?: 'De mail werd succesvol verstuurd.', ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
+        <?php if ($status === 'error'): ?><div class="alert error"><?= htmlspecialchars($message ?: 'De mail kon niet worden verstuurd.', ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
 
         <form id="mailForm" action="send.php" method="post" novalidate>
-            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
-
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(authCsrfToken(), ENT_QUOTES, 'UTF-8') ?>">
             <div class="form-grid">
-                <div class="field">
-                    <label for="customer_name">Naam klant</label>
-                    <input id="customer_name" name="customer_name" type="text" autocomplete="name" required maxlength="100" placeholder="Bijvoorbeeld: Jan Peeters">
-                    <small class="field-error"></small>
-                </div>
-
-                <div class="field">
-                    <label for="customer_email">E-mailadres</label>
-                    <input id="customer_email" name="customer_email" type="email" autocomplete="email" required maxlength="190" placeholder="jan@example.be">
-                    <small class="field-error"></small>
-                </div>
-
-                <div class="field field-full">
-                    <label for="bike_type">Nieuwe fiets</label>
-                    <input id="bike_type" name="bike_type" type="text" required maxlength="150" placeholder="Bijvoorbeeld: Trek Madone SL 7 Gen 8">
-                    <small class="field-error"></small>
-                </div>
-
-                <div class="field field-full">
-                    <label for="pickup_note">Extra boodschap <span>(optioneel)</span></label>
-                    <textarea id="pickup_note" name="pickup_note" rows="4" maxlength="500" placeholder="Bijvoorbeeld: Gelieve je identiteitskaart mee te brengen."></textarea>
-                    <small class="counter"><span id="noteCount">0</span>/500</small>
-                </div>
+                <div class="field"><label for="customer_name">Naam klant</label><input id="customer_name" name="customer_name" type="text" autocomplete="name" required maxlength="100" placeholder="Bijvoorbeeld: Jan Peeters"><small class="field-error"></small></div>
+                <div class="field"><label for="customer_email">E-mailadres</label><input id="customer_email" name="customer_email" type="email" autocomplete="email" required maxlength="190" placeholder="jan@example.be"><small class="field-error"></small></div>
+                <div class="field field-full"><label for="bike_type">Nieuwe fiets</label><input id="bike_type" name="bike_type" type="text" required maxlength="150" placeholder="Bijvoorbeeld: Trek Madone SL 7 Gen 8"><small class="field-error"></small></div>
+                <div class="field field-full"><label for="pickup_note">Extra boodschap <span>(optioneel)</span></label><textarea id="pickup_note" name="pickup_note" rows="4" maxlength="500" placeholder="Bijvoorbeeld: Gelieve je identiteitskaart mee te brengen."></textarea><small class="counter"><span id="noteCount">0</span>/500</small></div>
             </div>
-
             <div class="actions">
                 <button type="button" class="button button-secondary" id="previewButton">Voorbeeld bekijken</button>
                 <button type="submit" class="button button-secondary" name="mode" value="eml">Outlook .eml maken</button>
@@ -80,16 +58,9 @@ $message = $_GET['message'] ?? '';
 </main>
 
 <dialog id="previewDialog">
-    <div class="dialog-header">
-        <div>
-            <p class="eyebrow">Voorbeeld</p>
-            <h2>Mail naar klant</h2>
-        </div>
-        <button type="button" class="icon-button" id="closePreview" aria-label="Voorbeeld sluiten">×</button>
-    </div>
+    <div class="dialog-header"><div><p class="eyebrow">Voorbeeld</p><h2>Mail naar klant</h2></div><button type="button" class="icon-button" id="closePreview" aria-label="Voorbeeld sluiten">×</button></div>
     <div id="previewContent" class="preview-content"></div>
 </dialog>
-
 <script src="assets/app.js" defer></script>
 </body>
 </html>
