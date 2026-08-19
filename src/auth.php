@@ -170,10 +170,16 @@ function authCurrentUser(): ?array
         return null;
     }
 
-    $stmt = authDb()->prepare('SELECT id,name,email,role,active FROM users WHERE id = ? LIMIT 1');
+    $stmt = authDb()->prepare('SELECT id,name,email,role,active,password_changed_at FROM users WHERE id = ? LIMIT 1');
     $stmt->execute([(int) $_SESSION['auth_user_id']]);
     $user = $stmt->fetch();
     if (!$user || (int) $user['active'] !== 1) {
+        authLogout(false);
+        return null;
+    }
+
+    $sessionPasswordChangedAt = (string) ($_SESSION['auth_password_changed_at'] ?? '');
+    if ($sessionPasswordChangedAt === '' || !hash_equals((string) $user['password_changed_at'], $sessionPasswordChangedAt)) {
         authLogout(false);
         return null;
     }
@@ -262,6 +268,7 @@ function authLogin(string $email, string $password): bool
     $_SESSION['auth_user_id'] = (int) $user['id'];
     $_SESSION['auth_started_at'] = time();
     $_SESSION['auth_last_seen'] = time();
+    $_SESSION['auth_password_changed_at'] = (string) $user['password_changed_at'];
     authRotateCsrf();
     authDb()->prepare('UPDATE users SET last_login_at = ? WHERE id = ?')->execute([authNow(), (int) $user['id']]);
     authAudit('login_success', (int) $user['id'], (int) $user['id']);
