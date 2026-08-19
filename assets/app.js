@@ -5,7 +5,6 @@ const closePreview = document.querySelector('#closePreview');
 const previewContent = document.querySelector('#previewContent');
 const note = document.querySelector('#pickup_note');
 const noteCount = document.querySelector('#noteCount');
-const downloadMessage = document.querySelector('#downloadMessage');
 
 const fields = {
     customer_name: 'Vul de naam van de klant in.',
@@ -93,6 +92,9 @@ form.addEventListener('submit', event => {
         return;
     }
 
-    downloadMessage.hidden = false;
-    downloadMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const submitter = event.submitter;
+    if (submitter && submitter.value === 'graph') {
+        submitter.disabled = true;
+        submitter.textContent = 'Mail wordt verstuurd…';
+    }
 });
