@@ -4,21 +4,30 @@
 const MS_TENANT_ID = 'VUL_HIER_TENANT_ID_IN';
 const MS_CLIENT_ID = 'VUL_HIER_CLIENT_ID_IN';
 const MS_CLIENT_SECRET = 'VUL_HIER_CLIENT_SECRET_IN';
-
-// Microsoft Graph instellingen
 const MS_GRAPH_BASE_URL = 'https://graph.microsoft.com/v1.0';
 const MS_GRAPH_SCOPE = 'https://graph.microsoft.com/.default';
 
-// Afzender
+// Mail
 const MAIL_FROM_ADDRESS = 'verkoop@aertsactionbike.be';
 const MAIL_FROM_NAME = 'Aerts Action Bike';
 const MAIL_REPLY_TO = 'verkoop@aertsactionbike.be';
 
-// Rechtstreeks verzenden via Microsoft Graph
-const INTERNAL_SEND_ENABLED = true;
+// Afspraaklink
+const BOOKING_URL = 'https://outlook.office365.com/book/Verkochtefietsen@aertsactionbike.be/?ismsaljsauthenabled=true';
 
-// Outlook .eml als fallback wanneer Graph niet kan verzenden
+// Verzendmodus
+const INTERNAL_SEND_ENABLED = true;
 const EML_FALLBACK_ENABLED = true;
 
-// Link waarmee klanten een afhaalmoment voor hun nieuwe fiets boeken.
-const BOOKING_URL = 'https://outlook.office365.com/book/Verkochtefietsen@aertsactionbike.be/?ismsaljsauthenabled=true';
+// Interne loginbeveiliging
+// Genereer lokaal twee verschillende willekeurige waarden, bv.:
+// php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"
+const AUTH_SETUP_KEY = 'VUL_HIER_EEN_LANGE_WILLEKEURIGE_SETUP_SLEUTEL_IN';
+const AUTH_AUDIT_PEPPER = 'VUL_HIER_EEN_ANDERE_LANGE_WILLEKEURIGE_WAARDE_IN';
+
+// SQLite blijft lokaal/server-side en wordt niet naar GitHub gepusht.
+const AUTH_DB_PATH = __DIR__ . '/../data/auth.sqlite';
+
+// 30 minuten inactiviteit, maximaal 8 uur per login.
+const AUTH_IDLE_TIMEOUT = 1800;
+const AUTH_ABSOLUTE_TIMEOUT = 28800;
