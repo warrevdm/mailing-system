@@ -15,11 +15,18 @@ function authSessionStart(): void
     ini_set('session.cookie_httponly', '1');
     ini_set('session.cookie_samesite', 'Strict');
 
-    $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+    $httpsDetected = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+    $secure = defined('AUTH_FORCE_SECURE_COOKIE')
+        ? (bool) AUTH_FORCE_SECURE_COOKIE
+        : $httpsDetected;
+    $cookiePath = defined('AUTH_COOKIE_PATH') && trim((string) AUTH_COOKIE_PATH) !== ''
+        ? (string) AUTH_COOKIE_PATH
+        : '/';
+
     session_name('AAB_INTERNAL');
     session_set_cookie_params([
         'lifetime' => 0,
-        'path' => '/',
+        'path' => $cookiePath,
         'secure' => $secure,
         'httponly' => true,
         'samesite' => 'Strict',
