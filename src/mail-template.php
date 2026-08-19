@@ -5,15 +5,6 @@ function e(string $value): string
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-function getMailLogoUrl(): string
-{
-    if (defined('MAIL_LOGO_URL') && filter_var((string) MAIL_LOGO_URL, FILTER_VALIDATE_URL)) {
-        return (string) MAIL_LOGO_URL;
-    }
-
-    return '';
-}
-
 function buildMailHtml(string $name, string $bikeType, string $pickupNote = ''): string
 {
     $safeName = e($name);
@@ -24,10 +15,7 @@ function buildMailHtml(string $name, string $bikeType, string $pickupNote = ''):
         : '';
 
     $bookingUrl = e(BOOKING_URL);
-    $logoUrl = e(getMailLogoUrl());
-    $logoBlock = $logoUrl !== ''
-        ? '<div style="display:inline-block;background:#ffffff;border-radius:10px;padding:9px 12px;margin-bottom:18px;"><img src="' . $logoUrl . '" width="190" alt="Aerts Action Bike" style="display:block;width:190px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;"></div>'
-        : '<div style="font-size:13px;letter-spacing:1.7px;text-transform:uppercase;color:#9bd889;font-weight:700;margin-bottom:12px;">Aerts Action Bike</div>';
+    $logoBlock = '<div style="display:inline-block;background:#ffffff;border-radius:10px;padding:9px 12px;margin-bottom:18px;"><img src="cid:aab-logo" width="190" alt="Aerts Action Bike" style="display:block;width:190px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;"></div>';
 
     return <<<HTML
 <!doctype html>
