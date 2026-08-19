@@ -11,6 +11,7 @@ const MS_GRAPH_SCOPE = 'https://graph.microsoft.com/.default';
 const MAIL_FROM_ADDRESS = 'verkoop@aertsactionbike.be';
 const MAIL_FROM_NAME = 'Aerts Action Bike';
 const MAIL_REPLY_TO = 'verkoop@aertsactionbike.be';
+const MAIL_LOGO_URL = 'https://www.aertsactionbike.cc/mailing-system/assets/aab-logo.png';
 
 // Afspraaklink
 const BOOKING_URL = 'https://outlook.office365.com/book/Verkochtefietsen@aertsactionbike.be/?ismsaljsauthenabled=true';
