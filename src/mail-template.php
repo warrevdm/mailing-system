@@ -5,6 +5,22 @@ function e(string $value): string
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+function getLogoDataUri(): string
+{
+    $logoPath = __DIR__ . '/../assets/aab-logo.svg';
+
+    if (!is_file($logoPath)) {
+        return '';
+    }
+
+    $logo = file_get_contents($logoPath);
+    if ($logo === false) {
+        return '';
+    }
+
+    return 'data:image/svg+xml;base64,' . base64_encode($logo);
+}
+
 function buildMailHtml(string $name, string $bikeType, string $pickupNote = ''): string
 {
     $safeName = e($name);
@@ -15,6 +31,10 @@ function buildMailHtml(string $name, string $bikeType, string $pickupNote = ''):
         : '';
 
     $bookingUrl = e(BOOKING_URL);
+    $logoDataUri = e(getLogoDataUri());
+    $logoBlock = $logoDataUri !== ''
+        ? '<div style="display:inline-block;background:#ffffff;border-radius:10px;padding:9px 12px;margin-bottom:18px;"><img src="' . $logoDataUri . '" width="190" alt="Aerts Action Bike" style="display:block;width:190px;max-width:100%;height:auto;border:0;"></div>'
+        : '<div style="font-size:13px;letter-spacing:1.7px;text-transform:uppercase;color:#9bd889;font-weight:700;margin-bottom:12px;">Aerts Action Bike</div>';
 
     return <<<HTML
 <!doctype html>
@@ -30,9 +50,9 @@ function buildMailHtml(string $name, string $bikeType, string $pickupNote = ''):
 <td align="center">
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:640px;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 8px 24px rgba(20,35,24,.08);">
     <tr>
-        <td style="background:#172019;padding:28px 32px;">
-            <div style="font-size:13px;letter-spacing:1.7px;text-transform:uppercase;color:#9bd889;font-weight:700;">Aerts Action Bike</div>
-            <h1 style="margin:10px 0 0;color:#ffffff;font-size:30px;line-height:1.2;">Je nieuwe fiets staat klaar</h1>
+        <td style="background:#172019;padding:24px 32px 28px;">
+            {$logoBlock}
+            <h1 style="margin:0;color:#ffffff;font-size:30px;line-height:1.2;">Je nieuwe fiets staat klaar</h1>
         </td>
     </tr>
     <tr>
