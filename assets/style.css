@@ -45,17 +45,20 @@ button, input, textarea { font: inherit; }
     justify-content: center;
 }
 
-.brand-mark {
-    width: 62px;
-    height: 62px;
+.brand-logo-wrap {
+    width: 230px;
+    max-width: 78%;
+    background: #fff;
     border-radius: 14px;
-    display: grid;
-    place-items: center;
-    background: var(--green);
-    color: #102012;
-    font-weight: 900;
-    letter-spacing: -.5px;
+    padding: 14px 16px;
     margin-bottom: 28px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.16);
+}
+
+.brand-logo {
+    display: block;
+    width: 100%;
+    height: auto;
 }
 
 .eyebrow {
