@@ -89,16 +89,45 @@ function requestGraphToken(): array
     return [true, (string) $data['access_token']];
 }
 
+function getInlineLogoAttachment(): ?array
+{
+    $logoPath = __DIR__ . '/assets/aab-logo.png';
+    if (!is_file($logoPath) || !is_readable($logoPath)) {
+        return null;
+    }
+
+    $logoBytes = file_get_contents($logoPath);
+    if ($logoBytes === false || $logoBytes === '') {
+        return null;
+    }
+
+    return [
+        '@odata.type' => '#microsoft.graph.fileAttachment',
+        'name' => 'aab-logo.png',
+        'contentType' => 'image/png',
+        'contentId' => 'aab-logo',
+        'isInline' => true,
+        'contentBytes' => base64_encode($logoBytes),
+    ];
+}
+
 function sendViaGraph(string $accessToken, string $email, string $subject, string $htmlBody): array
 {
     $endpoint = rtrim(MS_GRAPH_BASE_URL, '/') . '/users/' . rawurlencode(MAIL_FROM_ADDRESS) . '/sendMail';
+    $message = [
+        'subject' => $subject,
+        'body' => ['contentType' => 'HTML', 'content' => $htmlBody],
+        'toRecipients' => [['emailAddress' => ['address' => $email]]],
+        'replyTo' => [['emailAddress' => ['address' => MAIL_REPLY_TO]]],
+    ];
+
+    $logoAttachment = getInlineLogoAttachment();
+    if ($logoAttachment !== null) {
+        $message['attachments'] = [$logoAttachment];
+    }
+
     $payload = [
-        'message' => [
-            'subject' => $subject,
-            'body' => ['contentType' => 'HTML', 'content' => $htmlBody],
-            'toRecipients' => [['emailAddress' => ['address' => $email]]],
-            'replyTo' => [['emailAddress' => ['address' => MAIL_REPLY_TO]]],
-        ],
+        'message' => $message,
         'saveToSentItems' => true,
     ];
 
