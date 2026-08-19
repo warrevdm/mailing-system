@@ -53,9 +53,11 @@ function buildPreview() {
 
     previewContent.innerHTML = `
         <div style="max-width:640px;margin:auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 8px 24px rgba(20,35,24,.08);font-family:Arial,sans-serif;">
-            <div style="background:#172019;padding:28px 32px;color:#fff;">
-                <div style="font-size:13px;letter-spacing:1.7px;text-transform:uppercase;color:#9bd889;font-weight:700;">Aerts Action Bike</div>
-                <h2 style="margin:10px 0 0;font-size:30px;">Je nieuwe fiets staat klaar</h2>
+            <div style="background:#172019;padding:24px 32px 28px;color:#fff;">
+                <div style="display:inline-block;background:#fff;border-radius:10px;padding:9px 12px;margin-bottom:18px;">
+                    <img src="assets/aab-logo.svg" alt="Aerts Action Bike" style="display:block;width:190px;max-width:100%;height:auto;">
+                </div>
+                <h2 style="margin:0;font-size:30px;">Je nieuwe fiets staat klaar</h2>
             </div>
             <div style="padding:32px;font-size:16px;line-height:1.7;color:#263229;">
                 <small style="color:#667068;">Naar: ${email}</small><br><br>
