@@ -4,9 +4,9 @@ session_start();
 require __DIR__ . '/src/config.php';
 require __DIR__ . '/src/mail-template.php';
 
-function redirectWithError(string $message): never
+function redirectWithMessage(string $status, string $message): never
 {
-    header('Location: index.php?status=error&message=' . urlencode($message));
+    header('Location: index.php?status=' . urlencode($status) . '&message=' . urlencode($message));
     exit;
 }
 
@@ -15,74 +15,217 @@ function cleanHeaderValue(string $value): string
     return trim(str_replace(["\r", "\n"], '', $value));
 }
 
+function buildEml(string $name, string $email, string $subject, string $htmlBody, string $textBody): string
+{
+    $boundary = 'aab_' . bin2hex(random_bytes(16));
+    $fromName = cleanHeaderValue(MAIL_FROM_NAME);
+    $fromAddress = cleanHeaderValue(MAIL_FROM_ADDRESS);
+    $toAddress = cleanHeaderValue($email);
+    $encodedSubject = mb_encode_mimeheader($subject, 'UTF-8', 'B', "\r\n");
+    $encodedFromName = mb_encode_mimeheader($fromName, 'UTF-8', 'B', "\r\n");
+
+    $headers = [
+        'X-Unsent: 1',
+        'From: ' . $encodedFromName . ' <' . $fromAddress . '>',
+        'To: ' . $toAddress,
+        'Subject: ' . $encodedSubject,
+        'Date: ' . date(DATE_RFC2822),
+        'MIME-Version: 1.0',
+        'Content-Type: multipart/alternative; boundary="' . $boundary . '"',
+    ];
+
+    $eml = implode("\r\n", $headers) . "\r\n\r\n";
+    $eml .= '--' . $boundary . "\r\n";
+    $eml .= "Content-Type: text/plain; charset=UTF-8\r\n";
+    $eml .= "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
+    $eml .= quoted_printable_encode($textBody) . "\r\n\r\n";
+    $eml .= '--' . $boundary . "\r\n";
+    $eml .= "Content-Type: text/html; charset=UTF-8\r\n";
+    $eml .= "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
+    $eml .= quoted_printable_encode($htmlBody) . "\r\n\r\n";
+    $eml .= '--' . $boundary . "--\r\n";
+
+    return $eml;
+}
+
+function downloadEml(string $name, string $email, string $subject, string $htmlBody, string $textBody, bool $fallback = false): never
+{
+    $eml = buildEml($name, $email, $subject, $htmlBody, $textBody);
+    $safeFilename = preg_replace('/[^a-zA-Z0-9_-]+/', '-', strtolower($name));
+    $prefix = $fallback ? 'fallback-nieuwe-fiets-klaar-' : 'nieuwe-fiets-klaar-';
+    $filename = $prefix . trim((string) $safeFilename, '-') . '.eml';
+
+    header('Content-Type: message/rfc822');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Content-Length: ' . strlen($eml));
+    header('Cache-Control: no-store, no-cache, must-revalidate');
+    echo $eml;
+    exit;
+}
+
+function requestGraphToken(): array
+{
+    $tokenUrl = 'https://login.microsoftonline.com/' . rawurlencode(MS_TENANT_ID) . '/oauth2/v2.0/token';
+    $postFields = http_build_query([
+        'client_id' => MS_CLIENT_ID,
+        'client_secret' => MS_CLIENT_SECRET,
+        'scope' => MS_GRAPH_SCOPE,
+        'grant_type' => 'client_credentials',
+    ]);
+
+    $curl = curl_init($tokenUrl);
+    curl_setopt_array($curl, [
+        CURLOPT_POST => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
+        CURLOPT_POSTFIELDS => $postFields,
+    ]);
+
+    $response = curl_exec($curl);
+    $curlError = curl_error($curl);
+    $httpStatus = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+
+    if ($response === false) {
+        return [false, 'Netwerkfout bij Microsoft-login: ' . $curlError];
+    }
+
+    $data = json_decode((string) $response, true);
+    if ($httpStatus < 200 || $httpStatus >= 300 || !is_array($data) || empty($data['access_token'])) {
+        $detail = is_array($data)
+            ? (string) ($data['error_description'] ?? $data['error'] ?? 'Onbekende authenticatiefout')
+            : 'Ongeldig antwoord van Microsoft';
+        return [false, 'Microsoft-authenticatie mislukt: ' . mb_substr($detail, 0, 300)];
+    }
+
+    return [true, (string) $data['access_token']];
+}
+
+function sendViaGraph(string $accessToken, string $email, string $subject, string $htmlBody): array
+{
+    $endpoint = rtrim(MS_GRAPH_BASE_URL, '/') . '/users/' . rawurlencode(MAIL_FROM_ADDRESS) . '/sendMail';
+
+    $message = [
+        'subject' => $subject,
+        'body' => [
+            'contentType' => 'HTML',
+            'content' => $htmlBody,
+        ],
+        'toRecipients' => [[
+            'emailAddress' => ['address' => $email],
+        ]],
+        'replyTo' => [[
+            'emailAddress' => ['address' => MAIL_REPLY_TO],
+        ]],
+    ];
+
+    $payload = [
+        'message' => $message,
+        'saveToSentItems' => true,
+    ];
+
+    $curl = curl_init($endpoint);
+    curl_setopt_array($curl, [
+        CURLOPT_POST => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTPHEADER => [
+            'Authorization: Bearer ' . $accessToken,
+            'Content-Type: application/json',
+        ],
+        CURLOPT_POSTFIELDS => json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+    ]);
+
+    $response = curl_exec($curl);
+    $curlError = curl_error($curl);
+    $httpStatus = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+
+    if ($response === false) {
+        return [false, 'Netwerkfout bij Microsoft Graph: ' . $curlError];
+    }
+
+    if ($httpStatus === 202) {
+        return [true, ''];
+    }
+
+    $data = json_decode((string) $response, true);
+    $detail = is_array($data)
+        ? (string) ($data['error']['message'] ?? 'Onbekende Microsoft Graph-fout')
+        : 'Ongeldig antwoord van Microsoft Graph';
+
+    return [false, 'Microsoft Graph-fout (' . $httpStatus . '): ' . mb_substr($detail, 0, 300)];
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    redirectWithError('Ongeldige aanvraag.');
+    redirectWithMessage('error', 'Ongeldige aanvraag.');
 }
 
 $csrfToken = (string) ($_POST['csrf_token'] ?? '');
 if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrfToken)) {
-    redirectWithError('De sessie is verlopen. Herlaad de pagina en probeer opnieuw.');
+    redirectWithMessage('error', 'De sessie is verlopen. Herlaad de pagina en probeer opnieuw.');
 }
 
 $name = trim((string) ($_POST['customer_name'] ?? ''));
 $email = trim((string) ($_POST['customer_email'] ?? ''));
 $bikeType = trim((string) ($_POST['bike_type'] ?? ''));
 $pickupNote = trim((string) ($_POST['pickup_note'] ?? ''));
+$mode = (string) ($_POST['mode'] ?? 'graph');
 
 if ($name === '' || mb_strlen($name) > 100) {
-    redirectWithError('Vul een geldige klantnaam in.');
+    redirectWithMessage('error', 'Vul een geldige klantnaam in.');
 }
 if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 190) {
-    redirectWithError('Vul een geldig e-mailadres in.');
+    redirectWithMessage('error', 'Vul een geldig e-mailadres in.');
 }
 if ($bikeType === '' || mb_strlen($bikeType) > 150) {
-    redirectWithError('Vul een geldige fietsomschrijving in.');
+    redirectWithMessage('error', 'Vul een geldige fietsomschrijving in.');
 }
 if (mb_strlen($pickupNote) > 500) {
-    redirectWithError('De extra boodschap is te lang.');
+    redirectWithMessage('error', 'De extra boodschap is te lang.');
 }
 
 $subject = 'Je nieuwe fiets staat klaar voor afhaling';
 $htmlBody = buildMailHtml($name, $bikeType, $pickupNote);
 $textBody = buildMailText($name, $bikeType, $pickupNote);
-$boundary = 'aab_' . bin2hex(random_bytes(16));
-
-$fromName = cleanHeaderValue(MAIL_FROM_NAME);
-$fromAddress = cleanHeaderValue(MAIL_FROM_ADDRESS);
-$toAddress = cleanHeaderValue($email);
-$encodedSubject = mb_encode_mimeheader($subject, 'UTF-8', 'B', "\r\n");
-$encodedFromName = mb_encode_mimeheader($fromName, 'UTF-8', 'B', "\r\n");
-
-$headers = [
-    'X-Unsent: 1',
-    'From: ' . $encodedFromName . ' <' . $fromAddress . '>',
-    'To: ' . $toAddress,
-    'Subject: ' . $encodedSubject,
-    'Date: ' . date(DATE_RFC2822),
-    'MIME-Version: 1.0',
-    'Content-Type: multipart/alternative; boundary="' . $boundary . '"',
-];
-
-$eml = implode("\r\n", $headers) . "\r\n\r\n";
-$eml .= '--' . $boundary . "\r\n";
-$eml .= "Content-Type: text/plain; charset=UTF-8\r\n";
-$eml .= "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
-$eml .= quoted_printable_encode($textBody) . "\r\n\r\n";
-$eml .= '--' . $boundary . "\r\n";
-$eml .= "Content-Type: text/html; charset=UTF-8\r\n";
-$eml .= "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
-$eml .= quoted_printable_encode($htmlBody) . "\r\n\r\n";
-$eml .= '--' . $boundary . "--\r\n";
-
 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
-$safeFilename = preg_replace('/[^a-zA-Z0-9_-]+/', '-', strtolower($name));
-$filename = 'nieuwe-fiets-klaar-' . trim((string) $safeFilename, '-') . '.eml';
+if ($mode === 'eml') {
+    downloadEml($name, $email, $subject, $htmlBody, $textBody);
+}
 
-header('Content-Type: message/rfc822');
-header('Content-Disposition: attachment; filename="' . $filename . '"');
-header('Content-Length: ' . strlen($eml));
-header('Cache-Control: no-store, no-cache, must-revalidate');
+if (!defined('INTERNAL_SEND_ENABLED') || INTERNAL_SEND_ENABLED !== true) {
+    if (defined('EML_FALLBACK_ENABLED') && EML_FALLBACK_ENABLED === true) {
+        downloadEml($name, $email, $subject, $htmlBody, $textBody, true);
+    }
+    redirectWithMessage('error', 'Interne send mode is niet ingeschakeld.');
+}
 
-echo $eml;
-exit;
+foreach (['MS_TENANT_ID', 'MS_CLIENT_ID', 'MS_CLIENT_SECRET', 'MS_GRAPH_BASE_URL', 'MS_GRAPH_SCOPE', 'MAIL_FROM_ADDRESS', 'MAIL_REPLY_TO'] as $constant) {
+    if (!defined($constant) || trim((string) constant($constant)) === '' || str_contains((string) constant($constant), 'VUL_HIER')) {
+        redirectWithMessage('error', 'De Microsoft Graph-configuratie is nog niet volledig ingesteld in src/config.php.');
+    }
+}
+
+[$tokenOk, $tokenResult] = requestGraphToken();
+if (!$tokenOk) {
+    error_log($tokenResult);
+    if (defined('EML_FALLBACK_ENABLED') && EML_FALLBACK_ENABLED === true) {
+        downloadEml($name, $email, $subject, $htmlBody, $textBody, true);
+    }
+    redirectWithMessage('error', $tokenResult);
+}
+
+[$sendOk, $sendError] = sendViaGraph($tokenResult, $email, $subject, $htmlBody);
+if (!$sendOk) {
+    error_log($sendError);
+    if (defined('EML_FALLBACK_ENABLED') && EML_FALLBACK_ENABLED === true) {
+        downloadEml($name, $email, $subject, $htmlBody, $textBody, true);
+    }
+    redirectWithMessage('error', $sendError);
+}
+
+redirectWithMessage('success', 'De mail werd rechtstreeks via Microsoft 365 verstuurd naar ' . $email . '.');
