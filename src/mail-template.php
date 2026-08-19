@@ -5,20 +5,13 @@ function e(string $value): string
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-function getLogoDataUri(): string
+function getMailLogoUrl(): string
 {
-    $logoPath = __DIR__ . '/../assets/aab-logo.svg';
-
-    if (!is_file($logoPath)) {
-        return '';
+    if (defined('MAIL_LOGO_URL') && filter_var((string) MAIL_LOGO_URL, FILTER_VALIDATE_URL)) {
+        return (string) MAIL_LOGO_URL;
     }
 
-    $logo = file_get_contents($logoPath);
-    if ($logo === false) {
-        return '';
-    }
-
-    return 'data:image/svg+xml;base64,' . base64_encode($logo);
+    return '';
 }
 
 function buildMailHtml(string $name, string $bikeType, string $pickupNote = ''): string
@@ -31,9 +24,9 @@ function buildMailHtml(string $name, string $bikeType, string $pickupNote = ''):
         : '';
 
     $bookingUrl = e(BOOKING_URL);
-    $logoDataUri = e(getLogoDataUri());
-    $logoBlock = $logoDataUri !== ''
-        ? '<div style="display:inline-block;background:#ffffff;border-radius:10px;padding:9px 12px;margin-bottom:18px;"><img src="' . $logoDataUri . '" width="190" alt="Aerts Action Bike" style="display:block;width:190px;max-width:100%;height:auto;border:0;"></div>'
+    $logoUrl = e(getMailLogoUrl());
+    $logoBlock = $logoUrl !== ''
+        ? '<div style="display:inline-block;background:#ffffff;border-radius:10px;padding:9px 12px;margin-bottom:18px;"><img src="' . $logoUrl . '" width="190" alt="Aerts Action Bike" style="display:block;width:190px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;"></div>'
         : '<div style="font-size:13px;letter-spacing:1.7px;text-transform:uppercase;color:#9bd889;font-weight:700;margin-bottom:12px;">Aerts Action Bike</div>';
 
     return <<<HTML
