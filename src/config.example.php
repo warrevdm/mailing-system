@@ -28,6 +28,10 @@ const AUTH_AUDIT_PEPPER = 'VUL_HIER_EEN_ANDERE_LANGE_WILLEKEURIGE_WAARDE_IN';
 // SQLite blijft lokaal/server-side en wordt niet naar GitHub gepusht.
 const AUTH_DB_PATH = __DIR__ . '/../data/auth.sqlite';
 
+// Productie op https://www.aertsactionbike.cc/mailing-system/
+const AUTH_COOKIE_PATH = '/mailing-system/';
+const AUTH_FORCE_SECURE_COOKIE = true;
+
 // 30 minuten inactiviteit, maximaal 8 uur per login.
 const AUTH_IDLE_TIMEOUT = 1800;
 const AUTH_ABSOLUTE_TIMEOUT = 28800;
