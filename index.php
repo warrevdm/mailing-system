@@ -19,7 +19,9 @@ $message = $_GET['message'] ?? '';
 <body>
 <main class="app-shell">
     <section class="panel intro-panel">
-        <div class="brand-mark">AAB</div>
+        <div class="brand-logo-wrap">
+            <img src="assets/aab-logo.svg" alt="Aerts Action Bike" class="brand-logo">
+        </div>
         <p class="eyebrow">Aerts Action Bike</p>
         <h1>Nieuwe fiets klaar voor afhaling</h1>
         <p class="lead">Vul de klantgegevens in en maak een professioneel Outlook-concept met HTML-opmaak.</p>
