@@ -18,7 +18,7 @@ const fields = {
     bike_type: 'Vul het type of model van de nieuwe fiets in.'
 };
 
-const ID_CARD_MESSAGE = 'Gelieve je identiteitskaart mee te brengen voor de afhandeling van de leasing.';
+const ID_CARD_MESSAGE = 'Gelieve je identiteitskaart mee te brengen in functie van de leasing.';
 const LEASE_A_BIKE_PIN_MESSAGE = 'Gelieve je pincode van Lease a Bike mee te brengen.';
 const PICKUP_PREFIX = 'Je fiets kan opgehaald worden vanaf ';
 
