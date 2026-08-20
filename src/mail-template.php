@@ -35,8 +35,8 @@ function buildMailHtml(string $name, string $bikeType, string $pickupNote = ''):
         </td>
     </tr>
     <tr>
-        <td style="background:#172019;padding:24px 32px 26px;">
-            <h1 style="margin:0;color:#ffffff;font-size:30px;line-height:1.2;">Je nieuwe fiets staat klaar</h1>
+        <td align="center" style="background:#172019;padding:24px 32px 26px;text-align:center;">
+            <h1 style="margin:0;color:#ffffff;font-size:30px;line-height:1.2;text-align:center;">Je nieuwe fiets staat klaar</h1>
         </td>
     </tr>
     <tr>
