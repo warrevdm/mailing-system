@@ -15,7 +15,6 @@ function buildMailHtml(string $name, string $bikeType, string $pickupNote = ''):
         : '';
 
     $bookingUrl = e(BOOKING_URL);
-    $logoBlock = '<div style="display:inline-block;background:#ffffff;border-radius:10px;padding:9px 12px;margin-bottom:18px;"><img src="cid:aab-logo" width="190" alt="Aerts Action Bike" style="display:block;width:190px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;"></div>';
 
     return <<<HTML
 <!doctype html>
@@ -31,8 +30,12 @@ function buildMailHtml(string $name, string $bikeType, string $pickupNote = ''):
 <td align="center">
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:640px;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 8px 24px rgba(20,35,24,.08);">
     <tr>
-        <td style="background:#172019;padding:24px 32px 28px;">
-            {$logoBlock}
+        <td align="center" style="background:#ffffff;padding:20px 32px 18px;">
+            <img src="cid:aab-logo" width="270" alt="Aerts Action Bike" style="display:block;width:270px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;margin:0 auto;">
+        </td>
+    </tr>
+    <tr>
+        <td style="background:#172019;padding:24px 32px 26px;">
             <h1 style="margin:0;color:#ffffff;font-size:30px;line-height:1.2;">Je nieuwe fiets staat klaar</h1>
         </td>
     </tr>
@@ -55,7 +58,7 @@ function buildMailHtml(string $name, string $bikeType, string $pickupNote = ''):
     {$noteBlock}
     <tr>
         <td style="padding:0 32px 30px;font-size:15px;line-height:1.7;color:#455148;">
-            Heb je nog een vraag over je nieuwe fiets? Antwoord gerust op deze mail of neem contact op met onze winkel.
+            Heb je nog een vraag? Antwoord gerust op deze mail of neem contact op met onze winkel.
             <br><br>
             Sportieve groeten,<br>
             <strong>Team Aerts Action Bike</strong>
@@ -85,5 +88,5 @@ function buildMailText(string $name, string $bikeType, string $pickupNote = ''):
         $text .= "\nExtra informatie:\n{$pickupNote}\n";
     }
 
-    return $text . "\nHeb je nog een vraag over je nieuwe fiets? Antwoord gerust op deze mail.\n\nSportieve groeten,\nTeam Aerts Action Bike\nKapellensteenweg 394, 2920 Kalmthout\n+32 (0)3 666 97 01";
+    return $text . "\nHeb je nog een vraag? Antwoord gerust op deze mail of neem contact op met onze winkel.\n\nSportieve groeten,\nTeam Aerts Action Bike\nKapellensteenweg 394, 2920 Kalmthout\n+32 (0)3 666 97 01";
 }
