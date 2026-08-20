@@ -91,7 +91,7 @@ function requestGraphToken(): array
 
 function getInlineLogoAttachment(): ?array
 {
-    $logoPath = __DIR__ . '/assets/aab-logo.png';
+    $logoPath = __DIR__ . '/assets/aab-logo-email.jpg';
     if (!is_file($logoPath) || !is_readable($logoPath)) {
         return null;
     }
@@ -103,8 +103,8 @@ function getInlineLogoAttachment(): ?array
 
     return [
         '@odata.type' => '#microsoft.graph.fileAttachment',
-        'name' => 'aab-logo.png',
-        'contentType' => 'image/png',
+        'name' => 'aab-logo-email.jpg',
+        'contentType' => 'image/jpeg',
         'contentId' => 'aab-logo',
         'isInline' => true,
         'contentBytes' => base64_encode($logoBytes),
