@@ -51,6 +51,7 @@ $message = $_GET['message'] ?? '';
                     <label>Snelle boodschappen <span>(optioneel)</span></label>
                     <div class="quick-messages" role="group" aria-label="Snelle boodschappen">
                         <button type="button" class="quick-message" id="quickIdCard" aria-pressed="false">Identiteitskaart meenemen</button>
+                        <button type="button" class="quick-message" id="quickLeaseABike" aria-pressed="false">Lease a Bike: pincode + ID</button>
                         <button type="button" class="quick-message" id="quickPickupDate" aria-pressed="false">Afhalen vanaf datum</button>
                     </div>
                     <div class="pickup-date-row" id="pickupDateRow" hidden>
