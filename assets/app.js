@@ -7,7 +7,7 @@ const note = document.querySelector('#pickup_note');
 const noteCount = document.querySelector('#noteCount');
 const bikeInput = document.querySelector('#bike_type');
 const quickIdCard = document.querySelector('#quickIdCard');
-const quickLeaseABike = document.querySelector('#quickLeaseABike');
+const quickLeaseABikePin = document.querySelector('#quickLeaseABikePin');
 const quickPickupDate = document.querySelector('#quickPickupDate');
 const pickupDateRow = document.querySelector('#pickupDateRow');
 const pickupDate = document.querySelector('#pickup_date');
@@ -18,8 +18,8 @@ const fields = {
     bike_type: 'Vul het type of model van de nieuwe fiets in.'
 };
 
-const ID_CARD_MESSAGE = 'Gelieve je identiteitskaart mee te brengen.';
-const LEASE_A_BIKE_MESSAGE = 'Gelieve je pincode van Lease a Bike en je identiteitskaart mee te brengen voor de afhandeling van de leasing.';
+const ID_CARD_MESSAGE = 'Gelieve je identiteitskaart mee te brengen voor de afhandeling van de leasing.';
+const LEASE_A_BIKE_PIN_MESSAGE = 'Gelieve je pincode van Lease a Bike mee te brengen.';
 const PICKUP_PREFIX = 'Je fiets kan opgehaald worden vanaf ';
 
 function escapeHtml(value) {
@@ -51,14 +51,14 @@ function rebuildPickupNote() {
     const lines = note.value
         .split('\n')
         .map(line => line.trim())
-        .filter(line => line !== '' && line !== ID_CARD_MESSAGE && line !== LEASE_A_BIKE_MESSAGE && !line.startsWith(PICKUP_PREFIX));
+        .filter(line => line !== '' && line !== ID_CARD_MESSAGE && line !== LEASE_A_BIKE_PIN_MESSAGE && !line.startsWith(PICKUP_PREFIX));
 
     if (quickIdCard.classList.contains('active')) {
         lines.unshift(ID_CARD_MESSAGE);
     }
 
-    if (quickLeaseABike.classList.contains('active')) {
-        lines.unshift(LEASE_A_BIKE_MESSAGE);
+    if (quickLeaseABikePin.classList.contains('active')) {
+        lines.unshift(LEASE_A_BIKE_PIN_MESSAGE);
     }
 
     if (quickPickupDate.classList.contains('active') && pickupDate.value) {
@@ -136,8 +136,8 @@ quickIdCard.addEventListener('click', () => {
     rebuildPickupNote();
 });
 
-quickLeaseABike.addEventListener('click', () => {
-    setQuickActive(quickLeaseABike, !quickLeaseABike.classList.contains('active'));
+quickLeaseABikePin.addEventListener('click', () => {
+    setQuickActive(quickLeaseABikePin, !quickLeaseABikePin.classList.contains('active'));
     rebuildPickupNote();
 });
 
