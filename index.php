@@ -45,8 +45,21 @@ $message = $_GET['message'] ?? '';
             <div class="form-grid">
                 <div class="field"><label for="customer_name">Naam klant</label><input id="customer_name" name="customer_name" type="text" autocomplete="name" required maxlength="100" placeholder="Bijvoorbeeld: Jan Peeters"><small class="field-error"></small></div>
                 <div class="field"><label for="customer_email">E-mailadres</label><input id="customer_email" name="customer_email" type="email" autocomplete="email" required maxlength="190" placeholder="jan@example.be"><small class="field-error"></small></div>
-                <div class="field field-full"><label for="bike_type">Nieuwe fiets</label><input id="bike_type" name="bike_type" type="text" required maxlength="150" placeholder="Bijvoorbeeld: Trek Madone SL 7 Gen 8"><small class="field-error"></small></div>
-                <div class="field field-full"><label for="pickup_note">Extra boodschap <span>(optioneel)</span></label><textarea id="pickup_note" name="pickup_note" rows="4" maxlength="500" placeholder="Bijvoorbeeld: Gelieve je identiteitskaart mee te brengen."></textarea><small class="counter"><span id="noteCount">0</span>/500</small></div>
+                <div class="field field-full"><label for="bike_type">Nieuwe fiets</label><input id="bike_type" name="bike_type" type="text" required maxlength="150" placeholder="Bijvoorbeeld: Trek Madone SL 7 Gen 8"><small>Elk woord start automatisch met een hoofdletter.</small><small class="field-error"></small></div>
+
+                <div class="field field-full">
+                    <label>Snelle boodschappen <span>(optioneel)</span></label>
+                    <div class="quick-messages" role="group" aria-label="Snelle boodschappen">
+                        <button type="button" class="quick-message" id="quickIdCard" aria-pressed="false">Identiteitskaart meenemen</button>
+                        <button type="button" class="quick-message" id="quickPickupDate" aria-pressed="false">Afhalen vanaf datum</button>
+                    </div>
+                    <div class="pickup-date-row" id="pickupDateRow" hidden>
+                        <label for="pickup_date">Afhalen vanaf</label>
+                        <input id="pickup_date" type="date">
+                    </div>
+                </div>
+
+                <div class="field field-full"><label for="pickup_note">Extra boodschap <span>(optioneel)</span></label><textarea id="pickup_note" name="pickup_note" rows="4" maxlength="500" placeholder="Je kan hier nog extra informatie toevoegen."></textarea><small class="counter"><span id="noteCount">0</span>/500</small></div>
             </div>
             <div class="actions">
                 <button type="button" class="button button-secondary" id="previewButton">Voorbeeld bekijken</button>
