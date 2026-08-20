@@ -103,6 +103,23 @@ function authMigrate(PDO $pdo): void
         FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL,
         FOREIGN KEY(target_user_id) REFERENCES users(id) ON DELETE SET NULL
     )");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS mail_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NULL,
+        customer_name TEXT NOT NULL,
+        customer_email TEXT NOT NULL,
+        bike_type TEXT NOT NULL,
+        pickup_note TEXT NOT NULL DEFAULT '',
+        subject TEXT NOT NULL,
+        mode TEXT NOT NULL CHECK(mode IN ('graph','eml')),
+        status TEXT NOT NULL CHECK(status IN ('sent','failed','eml_created')),
+        error_message TEXT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL
+    )");
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_mail_log_user_time ON mail_log(user_id, created_at)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_mail_log_status_time ON mail_log(status, created_at)');
 }
 
 function authNow(): string
@@ -150,6 +167,32 @@ function authAudit(string $event, ?int $targetUserId = null, ?int $actorUserId =
     }
     $stmt = $pdo->prepare('INSERT INTO audit_log (user_id,event,target_user_id,ip_hash,created_at) VALUES (?,?,?,?,?)');
     $stmt->execute([$actorUserId, $event, $targetUserId, authPrivacyHash(authIp()), authNow()]);
+}
+
+function authLogMail(
+    int $userId,
+    string $customerName,
+    string $customerEmail,
+    string $bikeType,
+    string $pickupNote,
+    string $subject,
+    string $mode,
+    string $status,
+    ?string $errorMessage = null
+): void {
+    $stmt = authDb()->prepare('INSERT INTO mail_log (user_id,customer_name,customer_email,bike_type,pickup_note,subject,mode,status,error_message,created_at) VALUES (?,?,?,?,?,?,?,?,?,?)');
+    $stmt->execute([
+        $userId,
+        $customerName,
+        $customerEmail,
+        $bikeType,
+        $pickupNote,
+        $subject,
+        $mode,
+        $status,
+        $errorMessage !== null ? mb_substr($errorMessage, 0, 500) : null,
+        authNow(),
+    ]);
 }
 
 function authCurrentUser(): ?array
