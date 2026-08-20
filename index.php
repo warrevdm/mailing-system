@@ -75,6 +75,6 @@ $message = $_GET['message'] ?? '';
     <div class="dialog-header"><div><p class="eyebrow">Voorbeeld</p><h2>Mail naar klant</h2></div><button type="button" class="icon-button" id="closePreview" aria-label="Voorbeeld sluiten">×</button></div>
     <div id="previewContent" class="preview-content"></div>
 </dialog>
-<script src="assets/app.js" defer></script>
+<script src="assets/app.js?v=20260820-2" defer></script>
 </body>
 </html>
