@@ -54,6 +54,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $hash = password_hash($password, PASSWORD_DEFAULT);
             $update = authDb()->prepare('UPDATE users SET password_hash = ?, password_changed_at = ?, updated_at = ? WHERE id = ?');
             $update->execute([$hash, $now, $now, (int) $adminId]);
+
+            // Wis de rate-limit na een geldige noodreset zodat het nieuwe wachtwoord meteen bruikbaar is.
+            $emailHash = authPrivacyHash(mb_strtolower($email));
+            $ipHash = authPrivacyHash(authIp());
+            $clearAttempts = authDb()->prepare('DELETE FROM login_attempts WHERE email_hash = ? OR ip_hash = ?');
+            $clearAttempts->execute([$emailHash, $ipHash]);
+
             authAudit('admin_password_emergency_reset', (int) $adminId, null);
             authRotateCsrf();
             $success = true;
@@ -81,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if ($error !== ''): ?><div class="alert error"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
 
         <?php if ($success): ?>
-            <div class="alert success">Het adminwachtwoord is gewijzigd. Bestaande ingelogde sessies worden ongeldig. Zet nu <code>AUTH_ADMIN_RESET_ENABLED</code> terug op <code>false</code> en <a href="login.php">log opnieuw in</a>.</div>
+            <div class="alert success">Het adminwachtwoord is gewijzigd en de tijdelijke loginblokkering is gewist. Zet nu <code>AUTH_ADMIN_RESET_ENABLED</code> terug op <code>false</code> en <a href="login.php">log opnieuw in</a>.</div>
         <?php else: ?>
             <form method="post" autocomplete="off">
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(authCsrfToken(), ENT_QUOTES, 'UTF-8') ?>">
