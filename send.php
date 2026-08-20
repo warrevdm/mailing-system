@@ -173,23 +173,29 @@ authRotateCsrf();
 
 if ($mode === 'eml') {
     authAudit('mail_eml_created');
+    authLogMail((int) $currentUser['id'], $name, $email, $bikeType, $pickupNote, $subject, 'eml', 'eml_created');
     downloadEml($name, $email, $subject, $htmlBody, $textBody);
 }
 
 if (!defined('INTERNAL_SEND_ENABLED') || INTERNAL_SEND_ENABLED !== true) {
+    $error = 'Interne send mode is niet ingeschakeld.';
+    authLogMail((int) $currentUser['id'], $name, $email, $bikeType, $pickupNote, $subject, 'graph', 'failed', $error);
     if (defined('EML_FALLBACK_ENABLED') && EML_FALLBACK_ENABLED === true) downloadEml($name, $email, $subject, $htmlBody, $textBody, true);
-    redirectWithMessage('error', 'Interne send mode is niet ingeschakeld.');
+    redirectWithMessage('error', $error);
 }
 
 foreach (['MS_TENANT_ID','MS_CLIENT_ID','MS_CLIENT_SECRET','MS_GRAPH_BASE_URL','MS_GRAPH_SCOPE','MAIL_FROM_ADDRESS','MAIL_REPLY_TO'] as $constant) {
     if (!defined($constant) || trim((string) constant($constant)) === '' || str_contains((string) constant($constant), 'VUL_HIER')) {
-        redirectWithMessage('error', 'De Microsoft Graph-configuratie is nog niet volledig ingesteld in src/config.php.');
+        $error = 'De Microsoft Graph-configuratie is nog niet volledig ingesteld in src/config.php.';
+        authLogMail((int) $currentUser['id'], $name, $email, $bikeType, $pickupNote, $subject, 'graph', 'failed', $error);
+        redirectWithMessage('error', $error);
     }
 }
 
 [$tokenOk, $tokenResult] = requestGraphToken();
 if (!$tokenOk) {
     error_log($tokenResult);
+    authLogMail((int) $currentUser['id'], $name, $email, $bikeType, $pickupNote, $subject, 'graph', 'failed', $tokenResult);
     if (defined('EML_FALLBACK_ENABLED') && EML_FALLBACK_ENABLED === true) downloadEml($name, $email, $subject, $htmlBody, $textBody, true);
     redirectWithMessage('error', $tokenResult);
 }
@@ -198,9 +204,11 @@ if (!$tokenOk) {
 if (!$sendOk) {
     error_log($sendError);
     authAudit('mail_graph_failed');
+    authLogMail((int) $currentUser['id'], $name, $email, $bikeType, $pickupNote, $subject, 'graph', 'failed', $sendError);
     if (defined('EML_FALLBACK_ENABLED') && EML_FALLBACK_ENABLED === true) downloadEml($name, $email, $subject, $htmlBody, $textBody, true);
     redirectWithMessage('error', $sendError);
 }
 
 authAudit('mail_graph_sent');
+authLogMail((int) $currentUser['id'], $name, $email, $bikeType, $pickupNote, $subject, 'graph', 'sent');
 redirectWithMessage('success', 'De mail werd rechtstreeks via Microsoft 365 verstuurd naar ' . $email . '.');
