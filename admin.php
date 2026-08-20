@@ -89,25 +89,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$users = $pdo->query('SELECT id,name,email,role,active,created_at,last_login_at FROM users ORDER BY role ASC, name ASC')->fetchAll();
+$users = $pdo->query("SELECT u.id,u.name,u.email,u.role,u.active,u.created_at,u.last_login_at,
+    SUM(CASE WHEN ml.status = 'sent' THEN 1 ELSE 0 END) AS sent_count,
+    SUM(CASE WHEN ml.status = 'failed' THEN 1 ELSE 0 END) AS failed_count,
+    SUM(CASE WHEN ml.status = 'eml_created' THEN 1 ELSE 0 END) AS eml_count
+    FROM users u
+    LEFT JOIN mail_log ml ON ml.user_id = u.id
+    GROUP BY u.id,u.name,u.email,u.role,u.active,u.created_at,u.last_login_at
+    ORDER BY u.role ASC, u.name ASC")->fetchAll();
+
+$mailStats = $pdo->query("SELECT
+    SUM(CASE WHEN status = 'sent' THEN 1 ELSE 0 END) AS sent_count,
+    SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) AS failed_count,
+    SUM(CASE WHEN status = 'eml_created' THEN 1 ELSE 0 END) AS eml_count,
+    COUNT(*) AS total_count
+    FROM mail_log")->fetch() ?: ['sent_count' => 0, 'failed_count' => 0, 'eml_count' => 0, 'total_count' => 0];
+
+$mailHistory = $pdo->query("SELECT ml.id,ml.customer_name,ml.customer_email,ml.bike_type,ml.pickup_note,ml.subject,ml.mode,ml.status,ml.error_message,ml.created_at,
+    COALESCE(u.name, 'Onbekende gebruiker') AS user_name,
+    COALESCE(u.email, '') AS user_email
+    FROM mail_log ml
+    LEFT JOIN users u ON u.id = ml.user_id
+    ORDER BY ml.id DESC
+    LIMIT 250")->fetchAll();
 ?>
 <!doctype html>
 <html lang="nl-BE">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Gebruikersbeheer | Aerts Action Bike</title>
+    <title>Beheer | Aerts Action Bike</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 <main class="admin-shell">
     <header class="topbar">
-        <div class="topbar-brand"><img src="assets/aab-logo.svg" alt="Aerts Action Bike"><div><strong>Gebruikersbeheer</strong><small><?= htmlspecialchars((string) $admin['name'], ENT_QUOTES, 'UTF-8') ?> · Admin</small></div></div>
+        <div class="topbar-brand"><img src="assets/aab-logo.svg" alt="Aerts Action Bike"><div><strong>Admin dashboard</strong><small><?= htmlspecialchars((string) $admin['name'], ENT_QUOTES, 'UTF-8') ?> · Admin</small></div></div>
         <nav><a class="button button-secondary" href="index.php">Mailingtool</a><a class="button button-secondary" href="logout.php">Uitloggen</a></nav>
     </header>
 
     <?php if ($message !== ''): ?><div class="alert success"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
     <?php if ($error !== ''): ?><div class="alert error"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
+
+    <section class="mail-stats-grid">
+        <article class="stat-card"><span>Succesvol verstuurd</span><strong><?= (int) ($mailStats['sent_count'] ?? 0) ?></strong></article>
+        <article class="stat-card"><span>Mislukt</span><strong><?= (int) ($mailStats['failed_count'] ?? 0) ?></strong></article>
+        <article class="stat-card"><span>EML aangemaakt</span><strong><?= (int) ($mailStats['eml_count'] ?? 0) ?></strong></article>
+        <article class="stat-card"><span>Totaal gelogd</span><strong><?= (int) ($mailStats['total_count'] ?? 0) ?></strong></article>
+    </section>
 
     <section class="admin-grid">
         <article class="panel form-panel">
@@ -138,10 +167,10 @@ $users = $pdo->query('SELECT id,name,email,role,active,created_at,last_login_at 
     </section>
 
     <section class="panel users-panel">
-        <div class="users-heading"><div><p class="eyebrow">Accounts</p><h2>Gebruikers</h2></div><span><?= count($users) ?> accounts</span></div>
+        <div class="users-heading"><div><p class="eyebrow">Accounts</p><h2>Gebruikers & mailvolume</h2></div><span><?= count($users) ?> accounts</span></div>
         <div class="table-wrap">
             <table class="users-table">
-                <thead><tr><th>Naam</th><th>E-mail</th><th>Rol</th><th>Status</th><th>Laatste login</th><th>Acties</th></tr></thead>
+                <thead><tr><th>Naam</th><th>E-mail</th><th>Rol</th><th>Status</th><th>Verstuurd</th><th>Mislukt</th><th>EML</th><th>Laatste login</th><th>Acties</th></tr></thead>
                 <tbody>
                 <?php foreach ($users as $user): ?>
                     <tr>
@@ -149,6 +178,9 @@ $users = $pdo->query('SELECT id,name,email,role,active,created_at,last_login_at 
                         <td><?= htmlspecialchars((string) $user['email'], ENT_QUOTES, 'UTF-8') ?></td>
                         <td><?= $user['role'] === 'admin' ? 'Admin' : 'Gebruiker' ?></td>
                         <td><span class="status-pill <?= (int) $user['active'] === 1 ? 'active' : 'inactive' ?>"><?= (int) $user['active'] === 1 ? 'Actief' : 'Geblokkeerd' ?></span></td>
+                        <td><strong><?= (int) ($user['sent_count'] ?? 0) ?></strong></td>
+                        <td><?= (int) ($user['failed_count'] ?? 0) ?></td>
+                        <td><?= (int) ($user['eml_count'] ?? 0) ?></td>
                         <td><?= $user['last_login_at'] ? htmlspecialchars((string) $user['last_login_at'], ENT_QUOTES, 'UTF-8') : 'Nog niet' ?></td>
                         <td>
                             <?php if ($user['role'] !== 'admin'): ?>
@@ -157,6 +189,44 @@ $users = $pdo->query('SELECT id,name,email,role,active,created_at,last_login_at 
                                     <form method="post" class="reset-form"><input type="hidden" name="csrf_token" value="<?= htmlspecialchars(authCsrfToken(), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="action" value="reset_password"><input type="hidden" name="user_id" value="<?= (int) $user['id'] ?>"><input name="new_password" type="password" minlength="14" maxlength="128" placeholder="Nieuw wachtwoord" required><button class="button button-secondary" type="submit">Reset</button></form>
                                 </div>
                             <?php else: ?>—<?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel users-panel mail-history-panel">
+        <div class="users-heading"><div><p class="eyebrow">Controle & opvolging</p><h2>Mailhistoriek</h2></div><span>Laatste <?= count($mailHistory) ?> registraties</span></div>
+        <p class="history-note">Hier zie je wat vanuit de tool werd verstuurd of geprobeerd. Gebruik “Details” om de ingevulde boodschap en eventuele foutmelding na te kijken.</p>
+        <div class="table-wrap">
+            <table class="users-table mail-history-table">
+                <thead><tr><th>Tijdstip</th><th>Gebruiker</th><th>Klant</th><th>Ontvanger</th><th>Fiets</th><th>Status</th><th>Details</th></tr></thead>
+                <tbody>
+                <?php if (!$mailHistory): ?>
+                    <tr><td colspan="7">Er zijn nog geen mails geregistreerd.</td></tr>
+                <?php endif; ?>
+                <?php foreach ($mailHistory as $mail): ?>
+                    <?php
+                    $statusClass = $mail['status'] === 'sent' ? 'active' : ($mail['status'] === 'failed' ? 'inactive' : 'neutral');
+                    $statusLabel = $mail['status'] === 'sent' ? 'Verstuurd' : ($mail['status'] === 'failed' ? 'Mislukt' : 'EML gemaakt');
+                    ?>
+                    <tr>
+                        <td><?= htmlspecialchars((string) $mail['created_at'], ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><strong><?= htmlspecialchars((string) $mail['user_name'], ENT_QUOTES, 'UTF-8') ?></strong><?php if ($mail['user_email'] !== ''): ?><br><small><?= htmlspecialchars((string) $mail['user_email'], ENT_QUOTES, 'UTF-8') ?></small><?php endif; ?></td>
+                        <td><?= htmlspecialchars((string) $mail['customer_name'], ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars((string) $mail['customer_email'], ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars((string) $mail['bike_type'], ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><span class="status-pill <?= $statusClass ?>"><?= $statusLabel ?></span></td>
+                        <td>
+                            <details class="mail-details">
+                                <summary>Details</summary>
+                                <div><strong>Onderwerp</strong><p><?= htmlspecialchars((string) $mail['subject'], ENT_QUOTES, 'UTF-8') ?></p></div>
+                                <div><strong>Verzendwijze</strong><p><?= $mail['mode'] === 'graph' ? 'Microsoft 365' : 'Outlook .eml' ?></p></div>
+                                <div><strong>Extra boodschap</strong><p><?= $mail['pickup_note'] !== '' ? nl2br(htmlspecialchars((string) $mail['pickup_note'], ENT_QUOTES, 'UTF-8')) : 'Geen extra boodschap.' ?></p></div>
+                                <?php if ($mail['error_message']): ?><div class="mail-error"><strong>Foutmelding</strong><p><?= htmlspecialchars((string) $mail['error_message'], ENT_QUOTES, 'UTF-8') ?></p></div><?php endif; ?>
+                            </details>
                         </td>
                     </tr>
                 <?php endforeach; ?>
