@@ -17,22 +17,11 @@ $message = $_GET['message'] ?? '';
     <link rel="stylesheet" href="assets/communication.css?v=20260825-1">
 </head>
 <body class="bike-page">
-<header class="topbar app-topbar">
+<header class="topbar app-topbar" style="grid-template-columns:1fr auto;">
     <div class="topbar-brand">
         <img src="assets/aab-logo.svg" alt="Aerts Action Bike">
         <div><strong>Interne mailingtool</strong><small><?= htmlspecialchars((string) $currentUser['name'], ENT_QUOTES, 'UTF-8') ?></small></div>
     </div>
-
-    <nav class="topbar-systems" aria-label="Kies mailsysteem">
-        <a class="topbar-system system-bike active" href="index.php" aria-current="page">
-            <span class="system-icon" aria-hidden="true">🚲</span>
-            <span class="system-copy"><strong>Nieuwe fiets</strong><small>Afhaling met afspraak</small></span>
-        </a>
-        <a class="topbar-system system-collect" href="collect-go.php">
-            <span class="system-icon" aria-hidden="true">📦</span>
-            <span class="system-copy"><strong>Collect & Go</strong><small>Product ophalen zonder afspraak</small></span>
-        </a>
-    </nav>
 
     <nav class="topbar-actions">
         <a class="button button-secondary" href="communication-dashboard.php">Communicatie</a>
@@ -40,6 +29,17 @@ $message = $_GET['message'] ?? '';
         <a class="button button-secondary" href="logout.php">Uitloggen</a>
     </nav>
 </header>
+
+<nav class="topbar-systems" aria-label="Kies mailsysteem" style="width:min(1120px,calc(100% - 32px));margin:12px auto 0;justify-content:center;">
+    <a class="topbar-system system-bike active" href="index.php" aria-current="page">
+        <span class="system-icon" aria-hidden="true">🚲</span>
+        <span class="system-copy"><strong>Nieuwe fiets</strong><small>Afhaling met afspraak</small></span>
+    </a>
+    <a class="topbar-system system-collect" href="collect-go.php">
+        <span class="system-icon" aria-hidden="true">📦</span>
+        <span class="system-copy"><strong>Collect & Go</strong><small>Product ophalen zonder afspraak</small></span>
+    </a>
+</nav>
 
 <main class="app-shell">
     <section class="panel intro-panel">
