@@ -12,7 +12,7 @@ $message = $_GET['message'] ?? '';
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Interne mailingtool | Aerts Action Bike</title>
+    <title>Nieuwe fiets ophalen | Aerts Action Bike</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -27,13 +27,26 @@ $message = $_GET['message'] ?? '';
     </nav>
 </header>
 
+<nav class="system-switcher" aria-label="Kies mailsysteem">
+    <a class="system-card active" href="index.php" aria-current="page">
+        <span class="system-card-kicker">Systeem 1</span>
+        <strong>Nieuwe fiets ophalen</strong>
+        <span>Met afspraaklink voor een nieuwe fiets</span>
+    </a>
+    <a class="system-card" href="collect-go.php">
+        <span class="system-card-kicker">Systeem 2</span>
+        <strong>Collect & Go</strong>
+        <span>Bestelling of product ophalen zonder afspraak</span>
+    </a>
+</nav>
+
 <main class="app-shell">
     <section class="panel intro-panel">
         <div class="brand-logo-wrap"><img src="assets/aab-logo.svg" alt="Aerts Action Bike" class="brand-logo"></div>
-        <p class="eyebrow">Aerts Action Bike</p>
-        <h1 id="introTitle">Nieuwe fiets klaar voor afhaling</h1>
-        <p class="lead" id="introLead">Vul de klantgegevens in en verstuur de mail rechtstreeks vanuit verkoop@aertsactionbike.be via Microsoft 365.</p>
-        <div class="info-card"><strong>Interne send mode</strong><p id="introInfo">Nieuwe fiets: de klant ontvangt een bookinglink om de afhaling in te plannen.</p></div>
+        <p class="eyebrow">Nieuwe fiets</p>
+        <h1>Nieuwe fiets klaar voor afhaling</h1>
+        <p class="lead">Laat de klant weten dat de nieuwe fiets klaarstaat en laat de afhaling via de afspraaklink inplannen.</p>
+        <div class="info-card"><strong>Afhaling op afspraak</strong><p>Deze mail bevat de bookinglink voor de afhaling en persoonlijke uitleg van de nieuwe fiets.</p></div>
     </section>
 
     <section class="panel form-panel">
@@ -42,29 +55,13 @@ $message = $_GET['message'] ?? '';
 
         <form id="mailForm" action="send.php" method="post" novalidate>
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(authCsrfToken(), ENT_QUOTES, 'UTF-8') ?>">
-
-            <div class="field field-full mail-type-field">
-                <label>Type mail</label>
-                <div class="mail-type-options">
-                    <label class="mail-type-card active" for="mail_type_bike">
-                        <input id="mail_type_bike" name="mail_type" type="radio" value="bike" checked>
-                        <strong>Nieuwe fiets ophalen</strong>
-                        <span>Met bookinglink voor afhaling</span>
-                    </label>
-                    <label class="mail-type-card" for="mail_type_collect">
-                        <input id="mail_type_collect" name="mail_type" type="radio" value="collect_go">
-                        <strong>Collect & Go</strong>
-                        <span>Bestelling/product ophalen zonder afspraak</span>
-                    </label>
-                </div>
-            </div>
-
+            <input type="hidden" name="mail_type" value="bike">
             <div class="form-grid">
                 <div class="field"><label for="customer_name">Naam klant</label><input id="customer_name" name="customer_name" type="text" autocomplete="name" required maxlength="100" placeholder="Bijvoorbeeld: Jan Peeters"><small class="field-error"></small></div>
                 <div class="field"><label for="customer_email">E-mailadres</label><input id="customer_email" name="customer_email" type="email" autocomplete="email" required maxlength="190" placeholder="jan@example.be"><small class="field-error"></small></div>
-                <div class="field field-full"><label for="bike_type" id="itemLabel">Nieuwe fiets</label><input id="bike_type" name="bike_type" type="text" required maxlength="150" placeholder="Bijvoorbeeld: Trek Madone SL 7 Gen 8"><small id="itemHelp">Elk woord start automatisch met een hoofdletter.</small><small class="field-error"></small></div>
+                <div class="field field-full"><label for="bike_type">Nieuwe fiets</label><input id="bike_type" name="bike_type" type="text" required maxlength="150" placeholder="Bijvoorbeeld: Trek Madone SL 7 Gen 8"><small>Elk woord start automatisch met een hoofdletter.</small><small class="field-error"></small></div>
 
-                <div class="field field-full" id="bikeQuickMessages">
+                <div class="field field-full">
                     <label>Snelle boodschappen <span>(optioneel)</span></label>
                     <div class="quick-messages" role="group" aria-label="Snelle boodschappen">
                         <button type="button" class="quick-message" id="quickIdCard" aria-pressed="false">Identiteitskaart voor leasing</button>
@@ -92,6 +89,6 @@ $message = $_GET['message'] ?? '';
     <div class="dialog-header"><div><p class="eyebrow">Voorbeeld</p><h2>Mail naar klant</h2></div><button type="button" class="icon-button" id="closePreview" aria-label="Voorbeeld sluiten">×</button></div>
     <div id="previewContent" class="preview-content"></div>
 </dialog>
-<script src="assets/app.js?v=20260825-collectgo" defer></script>
+<script src="assets/app.js?v=20260825-split" defer></script>
 </body>
 </html>
