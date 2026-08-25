@@ -13,7 +13,7 @@ $message = $_GET['message'] ?? '';
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Nieuwe fiets ophalen | Aerts Action Bike</title>
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=20260825-theme2">
 </head>
 <body class="bike-page">
 <header class="topbar app-topbar">
