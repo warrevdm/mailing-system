@@ -13,7 +13,7 @@ $message = $_GET['message'] ?? '';
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Nieuwe fiets ophalen | Aerts Action Bike</title>
-    <link rel="stylesheet" href="assets/style.css?v=20260825-theme2">
+    <link rel="stylesheet" href="assets/style.css?v=20260825-comms1">
 </head>
 <body class="bike-page">
 <header class="topbar app-topbar">
@@ -34,6 +34,7 @@ $message = $_GET['message'] ?? '';
     </nav>
 
     <nav class="topbar-actions">
+        <a class="button button-secondary" href="communication-dashboard.php">Communicatie</a>
         <?php if (($currentUser['role'] ?? '') === 'admin'): ?><a class="button button-secondary" href="admin.php">Gebruikersbeheer</a><?php endif; ?>
         <a class="button button-secondary" href="logout.php">Uitloggen</a>
     </nav>
@@ -59,6 +60,8 @@ $message = $_GET['message'] ?? '';
                 <div class="field"><label for="customer_name">Naam klant</label><input id="customer_name" name="customer_name" type="text" autocomplete="name" required maxlength="100" placeholder="Bijvoorbeeld: Jan Peeters"><small class="field-error"></small></div>
                 <div class="field"><label for="customer_email">E-mailadres</label><input id="customer_email" name="customer_email" type="email" autocomplete="email" required maxlength="190" placeholder="jan@example.be"><small class="field-error"></small></div>
                 <div class="field field-full"><label for="bike_type">Nieuwe fiets</label><input id="bike_type" name="bike_type" type="text" required maxlength="150" placeholder="Bijvoorbeeld: Trek Madone SL 7 Gen 8"><small>Elk woord start automatisch met een hoofdletter.</small><small class="field-error"></small></div>
+
+                <div id="duplicateWarning" class="duplicate-warning field-full" hidden aria-live="polite"></div>
 
                 <div class="field field-full">
                     <label>Snelle boodschappen <span>(optioneel)</span></label>
@@ -88,6 +91,7 @@ $message = $_GET['message'] ?? '';
     <div class="dialog-header"><div><p class="eyebrow">Voorbeeld</p><h2>Mail naar klant</h2></div><button type="button" class="icon-button" id="closePreview" aria-label="Voorbeeld sluiten">×</button></div>
     <div id="previewContent" class="preview-content"></div>
 </dialog>
+<script src="assets/duplicate-check.js?v=20260825-1" defer></script>
 <script src="assets/app.js?v=20260825-split" defer></script>
 </body>
 </html>
