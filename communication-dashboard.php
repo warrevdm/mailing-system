@@ -66,28 +66,28 @@ function dashboardMailType(string $subject): string
     <link rel="stylesheet" href="assets/communication.css?v=20260825-1">
 </head>
 <body>
-<header class="topbar app-topbar">
+<header class="topbar app-topbar" style="grid-template-columns:1fr auto;">
     <div class="topbar-brand">
         <img src="assets/aab-logo.svg" alt="Aerts Action Bike">
         <div><strong>Communicatiedashboard</strong><small><?= h((string) $currentUser['name']) ?></small></div>
     </div>
-
-    <nav class="topbar-systems" aria-label="Mailingsystemen">
-        <a class="topbar-system system-bike" href="index.php">
-            <span class="system-icon" aria-hidden="true">🚲</span>
-            <span class="system-copy"><strong>Nieuwe fiets</strong><small>Afhaling met afspraak</small></span>
-        </a>
-        <a class="topbar-system system-collect" href="collect-go.php">
-            <span class="system-icon" aria-hidden="true">📦</span>
-            <span class="system-copy"><strong>Collect & Go</strong><small>Product ophalen zonder afspraak</small></span>
-        </a>
-    </nav>
 
     <nav class="topbar-actions">
         <?php if (($currentUser['role'] ?? '') === 'admin'): ?><a class="button button-secondary" href="admin.php">Gebruikersbeheer</a><?php endif; ?>
         <a class="button button-secondary" href="logout.php">Uitloggen</a>
     </nav>
 </header>
+
+<nav class="topbar-systems" aria-label="Mailingsystemen" style="width:min(1120px,calc(100% - 32px));margin:12px auto 0;justify-content:center;">
+    <a class="topbar-system system-bike" href="index.php">
+        <span class="system-icon" aria-hidden="true">🚲</span>
+        <span class="system-copy"><strong>Nieuwe fiets</strong><small>Afhaling met afspraak</small></span>
+    </a>
+    <a class="topbar-system system-collect" href="collect-go.php">
+        <span class="system-icon" aria-hidden="true">📦</span>
+        <span class="system-copy"><strong>Collect & Go</strong><small>Product ophalen zonder afspraak</small></span>
+    </a>
+</nav>
 
 <main class="communication-shell">
     <section class="communication-hero">
