@@ -15,7 +15,7 @@ $message = $_GET['message'] ?? '';
     <title>Nieuwe fiets ophalen | Aerts Action Bike</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
-<body>
+<body class="bike-page">
 <header class="topbar app-topbar">
     <div class="topbar-brand">
         <img src="assets/aab-logo.svg" alt="Aerts Action Bike">
@@ -23,13 +23,13 @@ $message = $_GET['message'] ?? '';
     </div>
 
     <nav class="topbar-systems" aria-label="Kies mailsysteem">
-        <a class="topbar-system active" href="index.php" aria-current="page">
-            <span>Nieuwe fiets</span>
-            <small>Met afspraak</small>
+        <a class="topbar-system system-bike active" href="index.php" aria-current="page">
+            <span class="system-icon" aria-hidden="true">🚲</span>
+            <span class="system-copy"><strong>Nieuwe fiets</strong><small>Afhaling met afspraak</small></span>
         </a>
-        <a class="topbar-system" href="collect-go.php">
-            <span>Collect & Go</span>
-            <small>Zonder afspraak</small>
+        <a class="topbar-system system-collect" href="collect-go.php">
+            <span class="system-icon" aria-hidden="true">📦</span>
+            <span class="system-copy"><strong>Collect & Go</strong><small>Product ophalen zonder afspraak</small></span>
         </a>
     </nav>
 
