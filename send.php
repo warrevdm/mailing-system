@@ -9,7 +9,9 @@ $currentUser = authRequireLogin();
 
 function redirectWithMessage(string $status, string $message): never
 {
-    header('Location: index.php?status=' . urlencode($status) . '&message=' . urlencode($message));
+    $mailType = (string) ($_POST['mail_type'] ?? 'bike');
+    $target = $mailType === 'collect_go' ? 'collect-go.php' : 'index.php';
+    header('Location: ' . $target . '?status=' . urlencode($status) . '&message=' . urlencode($message));
     exit;
 }
 
@@ -93,14 +95,9 @@ function requestGraphToken(): array
 function getInlineLogoAttachment(): ?array
 {
     $logoPath = __DIR__ . '/assets/aab-logo-email.jpg';
-    if (!is_file($logoPath) || !is_readable($logoPath)) {
-        return null;
-    }
-
+    if (!is_file($logoPath) || !is_readable($logoPath)) return null;
     $logoBytes = file_get_contents($logoPath);
-    if ($logoBytes === false || $logoBytes === '') {
-        return null;
-    }
+    if ($logoBytes === false || $logoBytes === '') return null;
 
     return [
         '@odata.type' => '#microsoft.graph.fileAttachment',
@@ -123,15 +120,9 @@ function sendViaGraph(string $accessToken, string $email, string $subject, strin
     ];
 
     $logoAttachment = getInlineLogoAttachment();
-    if ($logoAttachment !== null) {
-        $message['attachments'] = [$logoAttachment];
-    }
+    if ($logoAttachment !== null) $message['attachments'] = [$logoAttachment];
 
-    $payload = [
-        'message' => $message,
-        'saveToSentItems' => true,
-    ];
-
+    $payload = ['message' => $message, 'saveToSentItems' => true];
     $curl = curl_init($endpoint);
     curl_setopt_array($curl, [
         CURLOPT_POST => true,
