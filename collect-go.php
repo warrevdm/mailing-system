@@ -14,6 +14,7 @@ $message = $_GET['message'] ?? '';
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Collect & Go | Aerts Action Bike</title>
     <link rel="stylesheet" href="assets/style.css?v=20260825-comms1">
+    <link rel="stylesheet" href="assets/communication.css?v=20260825-1">
 </head>
 <body class="collect-page">
 <header class="topbar app-topbar">
