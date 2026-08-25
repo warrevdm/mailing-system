@@ -38,12 +38,21 @@ input.invalid,textarea.invalid { border-color:var(--danger); }
 .field-error { min-height:16px; color:var(--danger); font-size:12px; }
 .counter { align-self:flex-end; color:var(--muted); }
 
+.mail-type-field { margin-bottom:26px; }
+.mail-type-options { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.mail-type-card { position:relative; display:flex; flex-direction:column; gap:5px; padding:16px 18px; border:1px solid var(--border); border-radius:12px; background:#f8faf7; cursor:pointer; transition:.18s ease; }
+.mail-type-card:hover { border-color:var(--green); }
+.mail-type-card.active { border-color:var(--green); background:#eef8eb; box-shadow:0 0 0 3px rgba(96,187,70,.10); }
+.mail-type-card input { position:absolute; opacity:0; pointer-events:none; }
+.mail-type-card strong { font-size:15px; }
+.mail-type-card span { color:var(--muted); font-size:13px; line-height:1.4; font-weight:400; }
+
 .quick-messages { display:flex; gap:10px; flex-wrap:wrap; }
 .quick-message { border:1px solid var(--border); background:#f7f9f6; color:var(--ink); border-radius:999px; padding:10px 14px; cursor:pointer; font-weight:700; transition:.18s ease; }
 .quick-message:hover { border-color:var(--green); }
 .quick-message.active { background:#e8f6e3; border-color:var(--green); box-shadow:0 0 0 3px rgba(96,187,70,.10); }
 .pickup-date-row { display:grid; grid-template-columns:auto minmax(180px,260px); align-items:center; gap:12px; padding:14px; border:1px solid var(--border); background:#fbfcfb; border-radius:12px; }
-.pickup-date-row[hidden] { display:none; }
+.pickup-date-row[hidden], #bikeQuickMessages[hidden] { display:none; }
 .pickup-date-row input { margin:0; }
 
 .actions { display:flex; justify-content:flex-end; gap:12px; margin-top:30px; }
@@ -122,7 +131,7 @@ dialog::backdrop { background:rgba(13,20,15,.68); }
     .topbar { align-items:flex-start; flex-direction:column; }
 }
 @media (max-width:560px) {
-    .form-grid { grid-template-columns:1fr; }
+    .form-grid,.mail-type-options { grid-template-columns:1fr; }
     .field-full { grid-column:auto; }
     .actions { flex-direction:column-reverse; }
     .button { width:100%; }
