@@ -63,6 +63,7 @@ function dashboardMailType(string $subject): string
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Communicatiedashboard | Aerts Action Bike</title>
     <link rel="stylesheet" href="assets/style.css?v=20260825-comms1">
+    <link rel="stylesheet" href="assets/communication.css?v=20260825-1">
 </head>
 <body>
 <header class="topbar app-topbar">
