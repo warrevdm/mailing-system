@@ -21,24 +21,23 @@ $message = $_GET['message'] ?? '';
         <img src="assets/aab-logo.svg" alt="Aerts Action Bike">
         <div><strong>Interne mailingtool</strong><small><?= htmlspecialchars((string) $currentUser['name'], ENT_QUOTES, 'UTF-8') ?></small></div>
     </div>
-    <nav>
+
+    <nav class="topbar-systems" aria-label="Kies mailsysteem">
+        <a class="topbar-system active" href="index.php" aria-current="page">
+            <span>Nieuwe fiets</span>
+            <small>Met afspraak</small>
+        </a>
+        <a class="topbar-system" href="collect-go.php">
+            <span>Collect & Go</span>
+            <small>Zonder afspraak</small>
+        </a>
+    </nav>
+
+    <nav class="topbar-actions">
         <?php if (($currentUser['role'] ?? '') === 'admin'): ?><a class="button button-secondary" href="admin.php">Gebruikersbeheer</a><?php endif; ?>
         <a class="button button-secondary" href="logout.php">Uitloggen</a>
     </nav>
 </header>
-
-<nav class="system-switcher" aria-label="Kies mailsysteem">
-    <a class="system-card active" href="index.php" aria-current="page">
-        <span class="system-card-kicker">Systeem 1</span>
-        <strong>Nieuwe fiets ophalen</strong>
-        <span>Met afspraaklink voor een nieuwe fiets</span>
-    </a>
-    <a class="system-card" href="collect-go.php">
-        <span class="system-card-kicker">Systeem 2</span>
-        <strong>Collect & Go</strong>
-        <span>Bestelling of product ophalen zonder afspraak</span>
-    </a>
-</nav>
 
 <main class="app-shell">
     <section class="panel intro-panel">
